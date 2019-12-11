@@ -41,12 +41,13 @@ data class Field(var type: String, var name: String, var modifier: String, var c
  * @param extends 继承信息
  * @param implements 接口信息
  * @param packageName 包名
+ * @param importList 导包列表
  * @param fields 类成员变量
  * @param methods 类函数
  * @param
  * */
 data class Class(var name: String, var types: List<String>, var comment: String?, var extends: String?,
-                 var implements: List<String>?, var packageName: String,
+                 var implements: List<String>?, var packageName: String, var importList: List<String>?,
                  var fields: List<Field>?,
                  var methods : List<Method>?)
 
