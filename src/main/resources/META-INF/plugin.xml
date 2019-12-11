@@ -1,0 +1,35 @@
+<idea-plugin>
+    <id>com.jiangxq.toolbox</id>
+    <name>Template code generator</name>
+    <vendor email="jiangxiaqiu@yy.com" url="">YY INC</vendor>
+
+    <description>
+        一个快速生成模板类代码的辅助插件
+        旨在减少样板类代码的编写时间，每次为你节省20s 一天可以多出一倍coffee time
+    </description>
+
+    <change-notes>
+        1. 添加埋点代码生成功能
+        2. 快速生成IXXCore.java ImpXXCore.java 文件
+        3. 快速生成Pb接口
+        4. 支持自定义代码模板
+    </change-notes>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <applicationService serviceInterface="actions.IToolBoxApp"
+                            serviceImplementation="actions.impl.IToolBoxAppImpl"/>
+    </extensions>
+    <actions>
+
+        <action id="com.jiangxq.toolbox.MainMenuAction" class="actions.MainMenuAction" text="YYToolBox" description="主菜单">
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </action>
+
+        <group id="com.jiangxq.toolbox.CodeGeneratorGroup" class="actions.CodeGeneratorGroup" text="CodeGeneratorGroup"
+                description="模板代码生成组" popup="true">
+            <add-to-group group-id="GenerateGroup" anchor="after" relative-to-action="JavaGenerateGroup1"/>
+        </group>
+
+
+    </actions>
+</idea-plugin>
