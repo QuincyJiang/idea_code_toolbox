@@ -18,8 +18,8 @@
     <extensions defaultExtensionNs="com.intellij">
         <applicationService serviceInterface="actions.IToolBoxApp"
                             serviceImplementation="actions.impl.IToolBoxAppImpl"/>
-        <applicationService serviceInterface="ToolBoxSettings"
-                            serviceImplementation="ToolBoxSettings"/>
+        <applicationService serviceInterface="ToolboxSettings"
+                            serviceImplementation="ToolboxSettings"/>
     </extensions>
     <actions>
 

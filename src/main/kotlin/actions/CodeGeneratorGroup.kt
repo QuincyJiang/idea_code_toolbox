@@ -15,7 +15,6 @@ class CodeGeneratorGroup: ActionGroup(), DumbAware {
         }
         PlatformDataKeys.PROJECT.getData(e.dataContext) ?: return AnAction.EMPTY_ARRAY
         val children = ArrayList<AnAction>()
-        // fixme npe
         settings.mCodeTemplates.forEach { key, (_) -> children.add(getOrCreateAction(key)) }
 
         return children.toTypedArray()
