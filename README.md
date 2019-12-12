@@ -1,14 +1,14 @@
-#Code Generator Plugin for IDEA
+# Code Generator Plugin for IDEA
 ## 一、概述
 这是一个基于`Velocity（VM 模板）`语法 和 `Groovy` 脚本语法，通过自定义脚本文件 和一个抽象的 `contextClass`概念 来完成模板代码自动生成的 `IDEA/AndroidStudio` 插件。
 
-它通过内置的`Converter`， 将 `VirtualFile`（IDEA的api提供的对文件系统的抽象）转化为统一的`Class`（非`Java`概念的`Class`对象，其实是一种对`Java`文件结构的抽象， 下文的`Class`均指代这个意思）对象， 这个`VirtualFile`对象可以是文本文件、excel表格、通过文件选择器选中的一个`.java`文件，也可能是鼠标当前所在的`java`对象。
+它通过内置的`Converter`， 将 `VirtualFile` （IDEA的api提供的对文件系统的抽象）或者是`PsiClass`（IDEA提供的对class对象的抽象）转化为统一的`ClassStruct`（一种对`Java`文件结构的抽象）对象， 这个`VirtualFile`对象可以是文本文件、excel表格、通过文件选择器选中的一个`.java`文件， `PsiClass`则为 鼠标右键选中的当前class对象。
 
-插件内置了三个 `Converter`，分别是 `Java2ClassConverter`, `Pb2ClassConverter`, `Excel2ClassConverter`,他们各自通过一定的规则，对`java`文件，`proto`文件，`excel`文件进行了解析并转化为统一的`Class`实体。
+插件内置了三个 `Converter`，分别是 `Java2ClassConverter`, `Pb2ClassConverter`, `Excel2ClassConverter`,他们各自通过一定的规则，对`java`对象，`proto`文件，`excel`文件进行了解析并转化为统一的`ClassStruct`实体。
 
-解析后的`Class`实体包含了模板需要的全部信息。 此时 将该`Class`实体 和 模板文件 交给 `TemplateDecoder` 去匹配解析，替换模板中的占位符，输出生成的目标代码。
+解析后的`ClassStruct`实体包含了模板需要的全部信息。 此时 将该`ClassStruct`实体 和 模板文件 交给 `CodeGenerator` 去匹配解析，替换模板中的占位符，输出生成的目标代码。
 
-`TemplateDecoder` 支持解析 `Groovy` 和 `Velocity` 两种格式文件，都是非常常见的常用模板语言。
+`CodeGenerator` 支持解析 `Groovy` 和 `Velocity` 两种格式文件，都是非常常见的常用模板语言。
 
 
 ##  二、特点：
@@ -39,13 +39,11 @@
 这个当做一个feature去做，通过动态加载jar包应该是可以做到的，目前的设计还未支持。如果可以自定义转换器，插件的灵活性可以大大提升。
 
 
-
-
 ## 三、模板通配符
 
 ### contextClass
 
-用来生成模板类的父类，是一个`Class`实体
+用来生成模板类的父类，是一个`ClassStruct`实体
 
 此处的父类不是`java`意义上的父类，可以把它理解为一个上下文对象，
 这个父类 可以是从当前鼠标所在的类右键点击`Generate`菜单获取的，
@@ -101,20 +99,17 @@ import $import;
  * @Author $USER
  * @Description: $contextClass.comments
  */
-public ${ClassName} extends AbstractBaseCore implements ${contextClass}.name {
+public ${ClassName} extends AbstractBaseCore implements ${contextClass.name} {
 
 #foreach($method in contextClass.methods)
     /**
     * $method.comments
     **/
-    public $method.modifier $method.returnType $method.name (method.params) {
+    public $method.modifier $method.returnType $method.name (#foreach($param in method.params)
+    $param.type $param.name,
+    #end) {
 
         }
 }
 #end
 ```
-
-
-
-
-
