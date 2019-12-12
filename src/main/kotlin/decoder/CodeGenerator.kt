@@ -3,7 +3,7 @@ package decoder
 import com.google.common.collect.Maps
 import groovy.text.GStringTemplateEngine
 import model.BindingSource
-import model.Class
+import model.ClassStruct
 import model.CodeTemplate
 import model.GeneratedSourceCode
 import org.apache.commons.lang.time.DateFormatUtils
@@ -20,16 +20,16 @@ const val CLASS_NAME_KEY = "ClassName"
 
 /**
  * 模板解析器
- * 输入一个模板实体类CodeTemplate，输入一个抽象Class实体类，输出一个生成的class文件
+ * 输入一个模板实体类CodeTemplate，输入一个抽象Class实体类，输出一个生成的GeneratedSourceCode文件
  * */
-interface ITempDecoder {
-    fun decode(template: CodeTemplate, selectedClass: Class, currentClass: Class): GeneratedSourceCode
+interface ITempGenerator {
+    fun combine(template: CodeTemplate, selectedClass: ClassStruct, currentClass: ClassStruct): GeneratedSourceCode
 }
 
-abstract class AbsTempDecoder: ITempDecoder {
-    override fun decode(template: CodeTemplate, selectedClass: Class, currentClass: Class): GeneratedSourceCode {
+abstract class AbsTempGenerator: ITempGenerator {
+    override fun combine(template: CodeTemplate, selectedClass: ClassStruct, currentClass: ClassStruct): GeneratedSourceCode {
         val bindingSource = createBindingSource(template,selectedClass, currentClass)
-        val source = doDecode(template, bindingSource)
+        val source = doCombine(template, bindingSource)
         return GeneratedSourceCode(bindingSource.className, source)
     }
 
@@ -39,7 +39,7 @@ abstract class AbsTempDecoder: ITempDecoder {
      * BindingParams是为模板的占位符号提供具体数据的 具体说明
      * @see BindingSource
      * */
-    protected abstract fun doDecode(template: CodeTemplate, bindingSource: BindingSource): String
+    protected abstract fun doCombine(template: CodeTemplate, bindingSource: BindingSource): String
 
     /**
      * 添加绑定参数
@@ -49,8 +49,8 @@ abstract class AbsTempDecoder: ITempDecoder {
      * */
     private fun createBindingSource(
         template: CodeTemplate,
-        selectedClass: Class,
-        targetClass: Class
+        selectedClass: ClassStruct,
+        targetClass: ClassStruct
     ): BindingSource {
         val map = HashMap<String, Any>()
         map["contextClass"] = selectedClass
@@ -90,8 +90,8 @@ abstract class AbsTempDecoder: ITempDecoder {
  * Groovy模板解析器 选择Groovy作为模板语言的原因是idea对groovy文件有较好的语法高亮支持
  * */
 
-class GroovyTempDecoder: AbsTempDecoder() {
-    override fun doDecode(template: CodeTemplate, bindingSource: BindingSource): String {
+class GroovyTempGenerator: AbsTempGenerator() {
+    override fun doCombine(template: CodeTemplate, bindingSource: BindingSource): String {
         return decodeGroovy(template.tempStr, adjustBindings(bindingSource.bindParams))
     }
 
@@ -109,13 +109,13 @@ class GroovyTempDecoder: AbsTempDecoder() {
 /**
  * vm模板解析器
  * */
-class VelocityTemplateDecoder : AbsTempDecoder() {
+class VelocityTemplateGenerator : AbsTempGenerator() {
 
     override fun generateClassName(classNameTemplate: String, environment: Map<String, Any>): String {
         return decodeVelocity(classNameTemplate, environment)
     }
 
-    override fun doDecode(template: CodeTemplate, bindingSource: BindingSource): String {
+    override fun doCombine(template: CodeTemplate, bindingSource: BindingSource): String {
         return decodeVelocity(template.tempStr, bindingSource.bindParams)
     }
 

@@ -69,9 +69,9 @@ fun generateClassPath(sourcePath: String, className: String, extension: String =
 /**
  * 获取目标类的importList
  * */
-fun getImportList(javaFile: PsiJavaFile): List<String?> {
+fun getImportList(javaFile: PsiJavaFile): List<String> {
     val importList = javaFile.importList ?: return ArrayList()
-    return importList.importStatements.map { it.qualifiedName }
+    return importList.importStatements.map { it.qualifiedName?: "" }
 }
 
 /**
@@ -108,7 +108,8 @@ fun getMethods(psiClass: PsiClass): List<Method> {
         // 构造Method model对象
         Method(
             psiMethod.name, psiMethod.modifierList.text,
-            returnType, parameters
+            returnType, parameters,
+            psiMethod.body?.text?: ""
         )
     }
 }
