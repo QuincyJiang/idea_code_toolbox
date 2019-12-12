@@ -36,7 +36,7 @@
 ##
 
 
-#根据接口快速生成ImpIXXCore.java实现类文件 
+#根据接口快速生成IXXCoreImp.java实现类文件
 
 package $contextClass.packageName ;
 
