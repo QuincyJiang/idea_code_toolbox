@@ -16,10 +16,11 @@
     </change-notes>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceInterface="actions.IToolBoxApp"
-                            serviceImplementation="actions.impl.IToolBoxAppImpl"/>
+        <!--存储中心-->
         <applicationService serviceInterface="ToolboxSettings"
                             serviceImplementation="ToolboxSettings"/>
+        <!-- 配置UI-->
+        <applicationConfigurable instance="ui.ToolBoxConfigurable"/>
     </extensions>
     <actions>
 
