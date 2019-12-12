@@ -236,6 +236,3 @@ fun reformatJavaFile(theElement: PsiElement) {
         Logger.getInstance(TAG).error("reformat Java file failed", e)
     }
 }
-
-
-

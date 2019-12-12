@@ -15,7 +15,9 @@ class ToolboxSettings: PersistentStateComponent<ToolboxSettings> {
 
     // 初始化预置的默认模板
     init {
-        mCodeTemplates["CoreImp"] = getDefaultTemplates("CoreImp", CodeLanguage.Java, "CoreImpTemp")
+        // 根据选中IXXCore.java 生成XXCoreImp.java
+        mCodeTemplates["CoreImp"] = getDefaultTemplates("CoreImp",
+            CodeLanguage.Java, "#set(\$end = \${contextClass.name.length()} - 1)\${contextClass.name.substring(1,\${end})}Imp" ,"CoreImpTemp.vm")
     }
     override fun getState(): ToolboxSettings? {
        return this
@@ -35,18 +37,17 @@ class ToolboxSettings: PersistentStateComponent<ToolboxSettings> {
     fun addTemplate(name: String, template: CodeTemplate) {
         mCodeTemplates[name] = template
     }
-
-
-
 }
 
 fun getDefaultTemplates(templateName: String,
                         codeLanguage: CodeLanguage,
+                        targetClassName: String,
                         templateFileName: String): CodeTemplate {
     val velocityTemplate =
         FileUtil.loadTextAndClose(ToolboxSettings::class.java.getResourceAsStream("/temp/$templateFileName"))
     return CodeTemplate(
         templateName,
+        targetClassName,
         codeLanguage,
         velocityTemplate
     )

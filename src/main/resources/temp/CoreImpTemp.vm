@@ -1,0 +1,55 @@
+##
+##  【通用通配符:】
+##
+##  $TIME - 返回当前时间 格式为 yyyy-MM-dd
+##  $USER - 返回当前登录用户名 user.name
+##  $ClassName - 当前模板生成的目标java文件名
+##
+##  【模板通配符说明:】
+##
+##  $contextClass - 用来生成模板类的父类
+##                  注： 此处的父类不是java意义上的父类，可以把它理解为一个上下文对象，
+##                  这个父类 可以是从当前鼠标所在的类右键点击Generate菜单获取的，
+##                  也可以是通过导入特定格式文件解析出来的抽象，比如解析特定格式的excel文件，然后按照特定规则序列化获取到的抽象）
+##                  可以用该通配符来匹配目标类中的 类名、包名、继承、接口、成员变量、函数
+##                  用以生成模板类指定格式的代码
+##   详细说明见下
+##
+##  $contextClass.name - 类名
+##  $contextClass.types - 类类型 class interface enum
+##  $contextClass.packageName - 包名
+##  $contextClass.implements - 继承的接口列表
+##  $contextClass.extends - 继承的父类
+##  $contextClass.comments - 类说明
+##  $contextClass.fields - 类成员变量 可使用 for field in fields 迭代
+##          - type: 变量类型
+##          - name: 变量名
+##          - modifier: 变量访问修饰符 public static
+##          - comment: 变量注释
+##  $contextClass.methods - 类的方法 可使用 for methods in methods 迭代
+##          - name: 方法名
+##          - modifier: 方法访问修饰符
+##          - returnType: 方法返回类型
+##          - params: 方法入参
+##                  - name: 方法参数名
+##                  - type: 方法参数类型
+##
+
+
+#根据接口快速生成ImpIXXCore.java实现类文件 
+
+package $contextClass.packageName ;
+
+import com.yymobile.common.core.AbstractBaseCore;
+import com.yymobile.common.core.$contextClass.name;
+
+/**
+ * @Date Created: $TIME
+ * @Author $USER
+ * @Description: $contextClass.comments
+ */
+public interface ${ClassName} extends AbstractBaseCore implements ${contextClass}.name {
+
+
+
+}
