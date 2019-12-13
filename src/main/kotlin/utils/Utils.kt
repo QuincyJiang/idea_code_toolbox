@@ -109,7 +109,8 @@ fun getMethods(psiClass: PsiClass): List<Method> {
         Method(
             psiMethod.name, psiMethod.modifierList.text,
             returnType, parameters,
-            psiMethod.body?.text?: ""
+            psiMethod.body?.text?: "",
+            ""
         )
     }
 }

@@ -17,6 +17,13 @@ enum class CodeLanguage{
 }
 
 /**
+ * 模板类型 新建文件 还是 生成一个代码块
+ * */
+enum class TemplateType {
+    File, CodeBlock
+}
+
+/**
  * 解析模板和选中PSI Class File 生成对应的目标代码实体
  * */
 data class GeneratedSourceCode(var className: String, var sourceCode: String)

@@ -12,15 +12,17 @@ package model
  * @param returnType 返回值类型 eg. public fun(): Int 里的 Int
  * @param params 方法入参 eg . public fun(arg1: String, arg2: String): Int 里的 arg1, arg2
  * @param content 方法体
+ * @param comment 方法注释
  * */
-data class Method(var name: String, var modifier: String, var returnType: String, var params: List<Param>, var content: String)
+@NoArg data class Method(var name: String, var modifier: String, var returnType: String,
+                         var params: List<Param>, var content: String, var comment: String)
 /**
  * MethodParam
  * 方法入参的抽象实体
  * @param name 入参名 eg . public fun(arg1: String): Int 里的 args1
  * @param type 入参类型 eg . public fun(arg1: String): Int 里的 String
  * */
-data class Param(var name: String, var type: String)
+@NoArg data class Param(var name: String, var type: String)
 
 /**
  * ClassField
@@ -31,7 +33,7 @@ data class Param(var name: String, var type: String)
  * @param comment 变量注释
  * */
 
-data class Field(var type: String, var name: String, var modifier: String, var comment: String)
+@NoArg data class Field(var type: String, var name: String, var modifier: String, var comment: String)
 
 /**
  * ClassStruct
@@ -47,7 +49,7 @@ data class Field(var type: String, var name: String, var modifier: String, var c
  * @param methods 类函数
  * @param
  * */
-data class ClassStruct(var name: String, var type: String, var comment: String?, var extends: String?,
-                       var implements: List<String>?, var packageName: String, var importList: List<String>?,
-                       var fields: List<Field>?,
-                       var methods : List<Method>?)
+@NoArg data class ClassStruct(var name: String, var type: String, var comment: String?, var extends: String?,
+                                 var implements: List<String>?, var packageName: String, var importList: List<String>?,
+                                 var fields: List<Field>?,
+                                 var methods : List<Method>?)
