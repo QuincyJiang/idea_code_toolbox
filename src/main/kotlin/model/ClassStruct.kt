@@ -11,18 +11,24 @@ package model
  * @param modifier 方法修饰符  eg . public fun() 的 public
  * @param returnType 返回值类型 eg. public fun(): Int 里的 Int
  * @param params 方法入参 eg . public fun(arg1: String, arg2: String): Int 里的 arg1, arg2
+ * @param paramsStr 入参列表toString()
  * @param content 方法体
- * @param comment 方法注释
+ * @param comment 方法注释 多行注释的话 每一行为一个str 存在list中
  * */
 @NoArg data class Method(var name: String, var modifier: String, var returnType: String,
-                         var params: List<Param>, var content: String, var comment: String)
+                         var params: List<Param>,var paramsStr: String, var content: String, var comment: ArrayList<String>?)
 /**
  * MethodParam
  * 方法入参的抽象实体
  * @param name 入参名 eg . public fun(arg1: String): Int 里的 args1
  * @param type 入参类型 eg . public fun(arg1: String): Int 里的 String
+ * @param comment 入参说明
  * */
-@NoArg data class Param(var name: String, var type: String)
+@NoArg data class Param(var name: String, var type: String, var comment: String?) {
+    override fun toString(): String {
+        return "$type $name"
+    }
+}
 
 /**
  * ClassField
@@ -30,10 +36,10 @@ package model
  * @param type 类型
  * @param name 成员变量名
  * @param modifier 成员变量访问修饰符
- * @param comment 变量注释
+ * @param comment 变量注释 多行注释的话 每一行为一个str 存在list中
  * */
 
-@NoArg data class Field(var type: String, var name: String, var modifier: String, var comment: String)
+@NoArg data class Field(var type: String, var name: String, var modifier: String, var comment: ArrayList<String>?)
 
 /**
  * ClassStruct
@@ -49,7 +55,7 @@ package model
  * @param methods 类函数
  * @param
  * */
-@NoArg data class ClassStruct(var name: String, var type: String, var comment: String?, var extends: String?,
+@NoArg data class ClassStruct(var name: String, var type: String, var comment: ArrayList<String>?, var extends: String?,
                                  var implements: List<String>?, var packageName: String, var importList: List<String>?,
                                  var fields: List<Field>?,
                                  var methods : List<Method>?)

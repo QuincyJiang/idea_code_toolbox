@@ -1,10 +1,12 @@
 package utils
 
+import decoder.Excel2ClassInterfaceConvert
 import model.*
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileInputStream
+import java.io.IOException
 
 
 /**
@@ -69,7 +71,7 @@ fun readExcel(file: File): HiidoStaticExcel?  {
                         val keyContent = xssfSeetRow.getCell(keysIndex).getCellContent()
                         if (!keyContent.isEmpty()) {
                             val hiidoStaticKey = HiidoStaticKey::class.java.newInstance()
-                            hiidoStaticKey.key = key
+                            hiidoStaticKey.key = key.toLowerCase()
                             hiidoStaticKey.value = keyContent
                             keys.add(hiidoStaticKey)
                         }
@@ -104,10 +106,11 @@ fun Cell?.getCellContent(): String {
 }
 
 
-//@Test
-//@Throws(IOException::class)
-//fun main(args: Array<String>?) {
-//    val file = File("src/main/resources/temp/test.xlsx")
-//    val excel = readExcel(file)
-//    print(excel.toString())
-//}
+@Throws(IOException::class)
+fun main(args: Array<String>?) {
+    val file = File("src/main/resources/temp/test.xlsx")
+    val excel = readExcel(file)
+    val converter = Excel2ClassInterfaceConvert()
+    converter.convert2Class(excel!!.sheets["6.6"]!!)
+
+}

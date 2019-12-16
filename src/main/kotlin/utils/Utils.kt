@@ -98,7 +98,7 @@ fun getMethods(psiClass: PsiClass): List<Method> {
         val parameters :List<Param> = if (psiMethod.parameterList.isEmpty) ArrayList()
         else psiMethod.parameterList.parameters.map {
             psiParameter ->
-            Param(psiParameter.name?: "", psiParameter.modifierList?.text ?: "")
+            Param(psiParameter.name?: "", psiParameter.modifierList?.text ?: "", null)
         }
         // 获取PSI 方法返回值类型
         val returnType = if (psiMethod.returnType == null)
@@ -109,8 +109,9 @@ fun getMethods(psiClass: PsiClass): List<Method> {
         Method(
             psiMethod.name, psiMethod.modifierList.text,
             returnType, parameters,
+            parameters.toParmsStr(),
             psiMethod.body?.text?: "",
-            ""
+            null
         )
     }
 }
@@ -171,16 +172,28 @@ fun escapeMarkdown(str: String): String {
 /**
  * 获取注释文档
  * */
-private fun getDocCommentText(psiField: PsiField): String {
+private fun getDocCommentText(psiField: PsiField): ArrayList<String>? {
     if (psiField.docComment == null) {
-        return ""
+        return null
     }
-    val content = StringBuilder()
+    val content = ArrayList<String>()
     for (element in psiField.docComment!!.descriptionElements) {
-        content.append(element.text)
+        content.add(element.text)
     }
-    return content.toString()
+    return content
 }
+
+fun getDocCommentText(psiClass: PsiClass): ArrayList<String>? {
+    if (psiClass.docComment == null) {
+        return null
+    }
+    val content = ArrayList<String>()
+    for (element in psiClass.docComment!!.descriptionElements) {
+        content.add(element.text)
+    }
+    return content
+}
+
 
 /**
  * 获取字符缩进
