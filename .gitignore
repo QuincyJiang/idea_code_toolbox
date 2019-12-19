@@ -2,3 +2,4 @@ build/
 .idea/workspace.xml
 build/
 .gradle/
+src/main/resources/temp/*.xlsx

@@ -38,7 +38,7 @@ class Excel2ClassInterfaceConvert: IConvert {
             val methodComments = ArrayList<String>()
             methodComments.add(hiidoModel.remark)
             val params = ArrayList<Param>()
-            val methodContent = StringBuilder().append("MLog.info(TAG, \"${method.name} ")
+            val methodContent = StringBuilder().append("    MLog.info(TAG, \"${method.name} ")
             hiidoModel.keyList.forEachIndexed { index, hiidoStaticKey ->
                 val param = Param(hiidoStaticKey.key, "String", hiidoStaticKey.value)
                 params.add(param)
@@ -51,11 +51,11 @@ class Excel2ClassInterfaceConvert: IConvert {
                     methodContent.append("\", ${hiidoModel.keyList.toKeyStr()});")
                 }
             }
-            methodContent.append("\nProperty pro = new Property();")
+            methodContent.append("\n    Property pro = new Property();")
             hiidoModel.keyList.forEach {
-                methodContent.append("\npro.putString(\"${it.key}\", ${it.key});")
+                methodContent.append("\n    pro.putString(\"${it.key}\", ${it.key});")
             }
-            methodContent.append("\nHiidoSDK.instance().reportTimesEvent(getUid(), \"${hiidoModel.lable.splitSlash()[0]}\", " +
+            methodContent.append("\n    HiidoSDK.instance().reportTimesEvent(getUid(), \"${hiidoModel.lable.splitSlash()[0]}\", " +
                     "\"${hiidoModel.lable.splitSlash()[1]}\", pro);")
             method.params = params
             method.paramsStr = params.toParmsStr()

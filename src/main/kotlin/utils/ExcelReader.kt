@@ -5,6 +5,7 @@ import generator.VelocityTemplateGenerator
 import getDefaultTemplates
 import model.*
 import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
 import java.io.FileInputStream
@@ -26,7 +27,7 @@ fun readExcel(file: File): HiidoStaticExcel?  {
         xssfSheet.forEachIndexed { index, xssfRow ->
             // 遍历每个sheet的row 第一次遇到包含'Label'标签的单元格时，开始计算index索引
               xssfRow.forEach loop@{
-                if ( it.cellType == Cell.CELL_TYPE_STRING && it.stringCellValue == "Label") {
+                if ( it.cellType == CellType.STRING && it.stringCellValue == "Label") {
                     val sheetIndex = HiidoStaticSheetsIndex::class.java.newInstance()
                     sheetIndex.keysIndexMap = LinkedHashMap()
                     sheetIndex.titleRowIndex = index
@@ -96,12 +97,12 @@ fun readExcel(file: File): HiidoStaticExcel?  {
 fun Cell?.getCellContent(): String {
     if (this != null) {
         when (this.cellType) {
-            Cell.CELL_TYPE_STRING -> return this.stringCellValue
-            Cell.CELL_TYPE_BLANK -> return ""
-            Cell.CELL_TYPE_BOOLEAN -> return this.booleanCellValue.toString()
-            Cell.CELL_TYPE_ERROR -> return ""
-            Cell.CELL_TYPE_NUMERIC -> return this.numericCellValue.toString()
-            Cell.CELL_TYPE_FORMULA -> return ""
+            CellType.STRING -> return this.stringCellValue
+            CellType.BLANK -> return ""
+            CellType.BOOLEAN -> return this.booleanCellValue.toString()
+            CellType.ERROR -> return ""
+            CellType.NUMERIC -> return this.numericCellValue.toString()
+            CellType.FORMULA -> return ""
         }
     }
     return ""

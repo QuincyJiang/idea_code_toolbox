@@ -9,7 +9,10 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
 
-class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?) : JDialog() {
+/**
+ * 读取Excel files 后选择目标sheets
+ * */
+class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, var listener: onSelectListener?) : JDialog() {
     private var contentPane: JPanel? = null
     private var buttonOK: JButton? = null
     private var buttonCancel: JButton? = null
@@ -23,16 +26,6 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?) :
         setContentPane(contentPane)
         buttonGroup = ButtonGroup()
         isModal = true
-        mData = LinkedHashMap()
-        mData!!["5.5"] = HiidoStaticSheet::class.java.newInstance()
-        mData!!["6.6"] = HiidoStaticSheet::class.java.newInstance()
-        mData!!["6.7"] = HiidoStaticSheet::class.java.newInstance()
-        mData!!["6.8"] = HiidoStaticSheet::class.java.newInstance()
-        mData!!["6.9"] = HiidoStaticSheet::class.java.newInstance()
-        mData!!["6.10"] = HiidoStaticSheet::class.java.newInstance()
-        mData!!["6.11"] = HiidoStaticSheet::class.java.newInstance()
-        mData!!["6.12"] = HiidoStaticSheet::class.java.newInstance()
-        mData!!["6.13"] = HiidoStaticSheet::class.java.newInstance()
         getRootPane().defaultButton = buttonOK
         buttonOK!!.addActionListener { onOK() }
         buttonCancel!!.addActionListener { onCancel() }
@@ -53,6 +46,7 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?) :
         addSheetsList()
     }
 
+
     private fun addHeader() {
         headerView!!.layout = BoxLayout(headerView, BoxLayout.X_AXIS)
         val label1 = JLabel("选择表格")
@@ -71,12 +65,23 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?) :
     }
 
     private fun onOK() {
-        buttonGroup?.selection
+        mData?.let { map ->
+            val sheetName = buttonGroup?.elements?.toList()?.filter {
+                it.isSelected
+            }?.get(0)?.text
+            sheetName?.let {
+                listener?.onSelected(map[it])
+            }
+        }
         dispose()
     }
 
     private fun onCancel() {
-        // add your code here if necessary
+        listener?.onCanceled()
         dispose()
     }
+}
+interface onSelectListener{
+    fun onSelected(sheet: HiidoStaticSheet?)
+    fun onCanceled()
 }

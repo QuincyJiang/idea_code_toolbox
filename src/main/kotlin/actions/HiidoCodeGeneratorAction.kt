@@ -10,6 +10,9 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbService
 import generator.Excel2ClassInterfaceConvert
 import model.HiidoStaticExcel
+import model.HiidoStaticSheet
+import ui.ChooseSheetDialog
+import ui.onSelectListener
 import utils.readExcel
 import java.io.File
 
@@ -46,21 +49,28 @@ class HiidoCodeGeneratorAction internal constructor(private val templateKey: Str
         fileChooseDescriptor.title = "选择Excel文件"
         FileChooser.chooseFile(fileChooseDescriptor, e.project, null) {
             val excelFile = File(it.path)
-            // fixme: ClassCastException: org.apache.xerces.parsers.SAXParser cannot be cast to org.xml.sax.XMLReader
             val excel: HiidoStaticExcel? = readExcel(excelFile)
             val converter = Excel2ClassInterfaceConvert()
             excel?.let { staticExcel ->
-                // todo 加上GUI
-//                val dialog = ChooseSheetDialog()
-//                dialog.setData(staticExcel.sheets)
-//                dialog.isVisible = true
-                val targetSheet = staticExcel.sheets["6.6"]
-                val classStruct  = converter.convert2Class(targetSheet!!)
-                val template = settings.mCodeTemplates[templateKey]
-                val generator = settings.mVmSourceGenerator
-                val result = generator.combine(template!!, classStruct!!, null)
-                }
+                val dialog = ChooseSheetDialog(staticExcel.sheets, object : onSelectListener {
+                    override fun onSelected(sheet: HiidoStaticSheet?) {
+                        sheet?.let { selectedSheet ->
+                            val classStruct = converter.convert2Class(selectedSheet)
+                            val template = settings.mCodeTemplates[templateKey]
+                            val generator = settings.mVmSourceGenerator
+                            // fixme result 部分占位符解析异常
+                            val result = generator.combine(template!!, classStruct!!, null)
+                            // todo 将result插入当前光标所指的psiClass中
+                        }
+                    }
 
+                    override fun onCanceled() {
+
+                    }
+
+                })
+                dialog.isVisible = true
+            }
             }
         }
     }

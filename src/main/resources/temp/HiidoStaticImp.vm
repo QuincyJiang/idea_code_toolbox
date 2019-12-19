@@ -4,7 +4,7 @@
 #foreach($method in $contextClass.methods)
 @Override
 public void $method.name($method.paramsStr) {
-    $method.body
+$method.body
 }
 #end
 

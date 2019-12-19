@@ -14,6 +14,9 @@ import com.intellij.psi.util.PsiUtilBase
 import model.Field
 import model.Method
 import model.Param
+import java.awt.Dimension
+import java.awt.Toolkit
+import javax.swing.JDialog
 
 val TAG = "Utils"
 
@@ -250,4 +253,15 @@ fun reformatJavaFile(theElement: PsiElement) {
     } catch (e: Exception) {
         Logger.getInstance(TAG).error("reformat Java file failed", e)
     }
+}
+
+/**
+ * 设置为居中dialog
+ * */
+fun centerDialog(dialog: JDialog, width: Int, height: Int) {
+    dialog.preferredSize = Dimension(width, height)
+    val screenSize = Toolkit.getDefaultToolkit().screenSize //获取屏幕的尺寸
+    val screenWidth = screenSize.width //获取屏幕的宽
+    val screenHeight = screenSize.height //获取屏幕的高
+    dialog.setLocation(screenWidth / 2 - width / 2, screenHeight / 2 - height / 2)//设置窗口居中显示
 }
