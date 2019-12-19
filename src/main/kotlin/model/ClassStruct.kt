@@ -12,11 +12,11 @@ package model
  * @param returnType 返回值类型 eg. public fun(): Int 里的 Int
  * @param params 方法入参 eg . public fun(arg1: String, arg2: String): Int 里的 arg1, arg2
  * @param paramsStr 入参列表toString()
- * @param content 方法体
- * @param comment 方法注释 多行注释的话 每一行为一个str 存在list中
+ * @param body 方法体
+ * @param comments 方法注释 多行注释的话 每一行为一个str 存在list中
  * */
 @NoArg data class Method(var name: String, var modifier: String, var returnType: String,
-                         var params: List<Param>,var paramsStr: String, var content: String, var comment: ArrayList<String>?)
+                         var params: List<Param>, var paramsStr: String, var body: String, var comments: ArrayList<String>?)
 /**
  * MethodParam
  * 方法入参的抽象实体

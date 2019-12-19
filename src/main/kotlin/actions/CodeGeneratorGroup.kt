@@ -27,7 +27,12 @@ class CodeGeneratorGroup: ActionGroup(), DumbAware {
         val actionId = "com.jiangxq.toolbox.CodeGeneratorGroup.Action.$key"
         var action: AnAction? = ActionManager.getInstance().getAction(actionId)
         if (action == null) {
-            action = TempCodeGeneratorAction(key)
+            // 对埋点这种业务特殊处理下 毕竟埋点的excel解析目前不太通用
+            if (key === "IHiidoStatic" || key === "HiidoStaticImp") {
+                action = HiidoCodeGeneratorAction(key)
+            } else {
+                action = TempCodeGeneratorAction(key)
+            }
             ActionManager.getInstance().registerAction(actionId, action)
         }
         return action

@@ -1,6 +1,8 @@
 package utils
 
-import decoder.Excel2ClassInterfaceConvert
+import generator.Excel2ClassInterfaceConvert
+import generator.VelocityTemplateGenerator
+import getDefaultTemplates
 import model.*
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -111,6 +113,10 @@ fun main(args: Array<String>?) {
     val file = File("src/main/resources/temp/test.xlsx")
     val excel = readExcel(file)
     val converter = Excel2ClassInterfaceConvert()
-    converter.convert2Class(excel!!.sheets["6.6"]!!)
+    val classStruce = converter.convert2Class(excel!!.sheets["6.6"]!!)
+    val codeGenerator = VelocityTemplateGenerator()
+    val template = getDefaultTemplates("HiidoStaticImp",
+        CodeLanguage.Java, "Default", "HiidoStaticImp.vm")
+    val code = codeGenerator.combine(template, classStruce!!, null)
 
 }

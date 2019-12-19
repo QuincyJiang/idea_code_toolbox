@@ -1,4 +1,4 @@
-package decoder
+package generator
 
 import com.google.common.collect.Maps
 import groovy.text.GStringTemplateEngine
@@ -22,12 +22,12 @@ const val CLASS_NAME_KEY = "ClassName"
  * 模板解析器
  * 输入一个模板实体类CodeTemplate，输入一个抽象Class实体类，输出一个生成的GeneratedSourceCode文件
  * */
-interface ITempGenerator {
-    fun combine(template: CodeTemplate, selectedClass: ClassStruct, currentClass: ClassStruct): GeneratedSourceCode
+interface ISourceGenerator {
+    fun combine(template: CodeTemplate, selectedClass: ClassStruct, currentClass: ClassStruct?): GeneratedSourceCode
 }
 
-abstract class AbsTempGenerator: ITempGenerator {
-    override fun combine(template: CodeTemplate, selectedClass: ClassStruct, currentClass: ClassStruct): GeneratedSourceCode {
+abstract class AbsSourceGenerator: ISourceGenerator {
+    override fun combine(template: CodeTemplate, selectedClass: ClassStruct, currentClass: ClassStruct?): GeneratedSourceCode {
         val bindingSource = createBindingSource(template,selectedClass, currentClass)
         val source = doCombine(template, bindingSource)
         return GeneratedSourceCode(bindingSource.className, source)
@@ -50,11 +50,11 @@ abstract class AbsTempGenerator: ITempGenerator {
     private fun createBindingSource(
         template: CodeTemplate,
         selectedClass: ClassStruct,
-        targetClass: ClassStruct
+        targetClass: ClassStruct?
     ): BindingSource {
         val map = HashMap<String, Any>()
         map["contextClass"] = selectedClass
-        map["class"] = targetClass
+        map["class"] = targetClass ?: ""
         map["TIME"] = DateFormatUtils.format(Date(), "yyyy-MM-dd HH:mm:ss")
         map["USER"] = System.getProperty("user.name")
         map["BR"] = "\n"
@@ -90,7 +90,7 @@ abstract class AbsTempGenerator: ITempGenerator {
  * Groovy模板解析器 选择Groovy作为模板语言的原因是idea对groovy文件有较好的语法高亮支持
  * */
 
-class GroovyTempGenerator: AbsTempGenerator() {
+class GroovySourceGenerator: AbsSourceGenerator() {
     override fun doCombine(template: CodeTemplate, bindingSource: BindingSource): String {
         return decodeGroovy(template.tempStr, adjustBindings(bindingSource.bindParams))
     }
@@ -109,7 +109,7 @@ class GroovyTempGenerator: AbsTempGenerator() {
 /**
  * vm模板解析器
  * */
-class VelocityTemplateGenerator : AbsTempGenerator() {
+class VelocityTemplateGenerator : AbsSourceGenerator() {
 
     override fun generateClassName(classNameTemplate: String, environment: Map<String, Any>): String {
         return decodeVelocity(classNameTemplate, environment)

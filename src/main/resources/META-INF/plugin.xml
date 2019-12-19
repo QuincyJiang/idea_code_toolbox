@@ -24,10 +24,6 @@
     </extensions>
     <actions>
 
-        <action id="com.jiangxq.toolbox.MainMenuAction" class="actions.MainMenuAction" text="YYToolBox" description="主菜单">
-            <add-to-group group-id="ToolsMenu" anchor="last"/>
-        </action>
-
         <group id="com.jiangxq.toolbox.CodeGeneratorGroup" class="actions.CodeGeneratorGroup" text="CodeGeneratorGroup"
                 description="模板代码生成组" popup="true">
             <add-to-group group-id="GenerateGroup" anchor="after" relative-to-action="JavaGenerateGroup1"/>

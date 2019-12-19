@@ -1,8 +1,11 @@
+
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.util.xmlb.XmlSerializerUtil
+import generator.GroovySourceGenerator
+import generator.VelocityTemplateGenerator
 import model.CodeLanguage
 import model.CodeTemplate
 
@@ -12,12 +15,21 @@ import model.CodeTemplate
 @State(name = "ToolBoxSettings", storages = [Storage("\$APP_CONFIG$/ToolBoxSettings.xml")])
 class ToolboxSettings: PersistentStateComponent<ToolboxSettings> {
     var mCodeTemplates =  HashMap<String, CodeTemplate>(4)
+    // 两个generator 也是全局单例
+    var mGroovySourceGenerator = GroovySourceGenerator()
+    var mVmSourceGenerator = VelocityTemplateGenerator()
 
     // 初始化预置的默认模板
     init {
         // 根据选中IXXCore.java 生成XXCoreImp.java
         mCodeTemplates["CoreImp"] = getDefaultTemplates("CoreImp",
             CodeLanguage.Java, "#set(\$end = \${contextClass.name.length()} - 1)\${contextClass.name.substring(1,\${end})}Imp" ,"CoreImpTemp.vm")
+        //快速生成模板接口代码
+        mCodeTemplates["IHiidoStatic"] = getDefaultTemplates("IHiidoStatic",
+            CodeLanguage.Java, "Default", "IHiidoStatic.vm" )
+        //快速生成模板实现代码
+        mCodeTemplates["HiidoStaticImp"] = getDefaultTemplates("HiidoStaticImp",
+            CodeLanguage.Java, "Default", "HiidoStaticImp.vm" )
     }
     override fun getState(): ToolboxSettings? {
        return this
@@ -25,17 +37,6 @@ class ToolboxSettings: PersistentStateComponent<ToolboxSettings> {
 
     override fun loadState(state: ToolboxSettings) {
         XmlSerializerUtil.copyBean(state, this)
-    }
-
-    fun getTemplate(templateName: String): CodeTemplate? {
-        return mCodeTemplates[templateName]
-    }
-
-    fun removeTemplate(templateName: String) {
-        mCodeTemplates.remove(templateName)
-    }
-    fun addTemplate(name: String, template: CodeTemplate) {
-        mCodeTemplates[name] = template
     }
 }
 

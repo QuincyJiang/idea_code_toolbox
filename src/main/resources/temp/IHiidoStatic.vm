@@ -1,0 +1,12 @@
+
+#快速生成埋点接口代码
+
+#foreach($method in $contextClass.methods)
+/**
+#foreach($comment in $method.comments)
+* comment
+#end
+*/
+void $method.name($method.paramsStr);
+
+#end
