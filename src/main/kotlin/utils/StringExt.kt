@@ -17,7 +17,7 @@ fun ArrayList<Param>.toParmsStr(): String {
 fun ArrayList<HiidoStaticKey>.toKeyStr(): String {
     val result = StringBuilder()
     this.forEachIndexed { index, hiidoStaticKey ->
-        result.append(hiidoStaticKey.key + if (index == this.lastIndex) ", " else "")
+        result.append(hiidoStaticKey.key + if (index != this.lastIndex) ", " else "")
     }
     return result.toString()
 }
@@ -25,7 +25,7 @@ fun ArrayList<HiidoStaticKey>.toKeyStr(): String {
 fun List<HiidoStaticKey>.toKeyStr(): String {
     val result = StringBuilder()
     this.forEachIndexed { index, hiidoStaticKey ->
-        result.append(hiidoStaticKey.key + if (index == this.lastIndex) ", " else "")
+        result.append(hiidoStaticKey.key + if (index != this.lastIndex) ", " else "")
     }
     return result.toString()
 }

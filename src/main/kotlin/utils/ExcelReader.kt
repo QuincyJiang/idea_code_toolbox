@@ -16,8 +16,8 @@ import java.io.IOException
  * */
 fun readExcel(file: File): HiidoStaticExcel?  {
     val fileInputStream = FileInputStream(file)
-    val sheetsMap = HashMap<String, HiidoStaticSheet>()
-    val sheetsIndexMap = HashMap<String, HiidoStaticSheetsIndex>()
+    val sheetsMap = LinkedHashMap<String, HiidoStaticSheet>()
+    val sheetsIndexMap = LinkedHashMap<String, HiidoStaticSheetsIndex>()
     val workbook = XSSFWorkbook(fileInputStream)
 
     // 第一次遍历 获取每个sheet的索引表
@@ -28,7 +28,7 @@ fun readExcel(file: File): HiidoStaticExcel?  {
               xssfRow.forEach loop@{
                 if ( it.cellType == Cell.CELL_TYPE_STRING && it.stringCellValue == "Label") {
                     val sheetIndex = HiidoStaticSheetsIndex::class.java.newInstance()
-                    sheetIndex.keysIndexMap = HashMap()
+                    sheetIndex.keysIndexMap = LinkedHashMap()
                     sheetIndex.titleRowIndex = index
                     xssfRow.forEachIndexed{index, cell ->
                         when(cell.stringCellValue) {

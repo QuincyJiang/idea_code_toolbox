@@ -1,6 +1,5 @@
 package generator
 
-import com.google.common.collect.Maps
 import groovy.text.GStringTemplateEngine
 import model.BindingSource
 import model.ClassStruct
@@ -12,6 +11,7 @@ import org.apache.velocity.app.VelocityEngine
 import org.apache.velocity.runtime.log.NullLogChute
 import java.io.StringWriter
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 /**
  * 根据模板文件名解析规则 解析出的目标java文件名
@@ -52,7 +52,7 @@ abstract class AbsSourceGenerator: ISourceGenerator {
         selectedClass: ClassStruct,
         targetClass: ClassStruct?
     ): BindingSource {
-        val map = HashMap<String, Any>()
+        val map = LinkedHashMap<String, Any>()
         map["contextClass"] = selectedClass
         map["class"] = targetClass ?: ""
         map["TIME"] = DateFormatUtils.format(Date(), "yyyy-MM-dd HH:mm:ss")
@@ -70,7 +70,7 @@ abstract class AbsSourceGenerator: ISourceGenerator {
      * 生成的目标java文件名模板为  #set($end = ${contextClass.name.length()} - 1)${contextClass.name.substring(0,${end})}Imp
      * 那么生成的目标文件名就是  ChargeCoreImp.java
      * */
-    private fun tryParseTargetClassName(template: CodeTemplate, map: Map<String, Any>): String {
+    private fun tryParseTargetClassName(template: CodeTemplate, map: LinkedHashMap<String, Any>): String {
         val className: String
         try {
             className = generateClassName(template.targetClassNameTemp, map)
@@ -83,7 +83,7 @@ abstract class AbsSourceGenerator: ISourceGenerator {
         return className
     }
 
-    protected abstract fun generateClassName(classNameTemplate: String, environment: Map<String, Any>): String
+    protected abstract fun generateClassName(classNameTemplate: String, environment: LinkedHashMap<String, Any>): String
 }
 
 /**
@@ -95,13 +95,13 @@ class GroovySourceGenerator: AbsSourceGenerator() {
         return decodeGroovy(template.tempStr, adjustBindings(bindingSource.bindParams))
     }
 
-    private fun adjustBindings(env: Map<String, Any>): Map<String, Any> {
-        val map = Maps.newHashMap<String, Any>(env)
+    private fun adjustBindings(env: LinkedHashMap<String, Any>): LinkedHashMap<String, Any> {
+        val map = LinkedHashMap(env)
         map["clazz"] = env["class"]
         return map
     }
 
-    override fun generateClassName(classNameTemplate: String, environment: Map<String, Any>): String {
+    override fun generateClassName(classNameTemplate: String, environment: LinkedHashMap<String, Any>): String {
         return decodeGroovy(classNameTemplate, adjustBindings(environment))
     }
 }
@@ -111,7 +111,7 @@ class GroovySourceGenerator: AbsSourceGenerator() {
  * */
 class VelocityTemplateGenerator : AbsSourceGenerator() {
 
-    override fun generateClassName(classNameTemplate: String, environment: Map<String, Any>): String {
+    override fun generateClassName(classNameTemplate: String, environment: LinkedHashMap<String, Any>): String {
         return decodeVelocity(classNameTemplate, environment)
     }
 
@@ -137,7 +137,7 @@ val groovyTemplateEngine = GStringTemplateEngine()
 /**
  * 填充参数到velocity模板中
  * */
-fun decodeVelocity(template: String, map: Map<String, Any>): String{
+fun decodeVelocity(template: String, map: LinkedHashMap<String, Any>): String{
     val context = VelocityContext()
     map.forEach { key, value -> context.put(key, value) }
     val writer = StringWriter()
@@ -148,7 +148,7 @@ fun decodeVelocity(template: String, map: Map<String, Any>): String{
  * 填充参数到Groovy模板中
  * */
 
-fun decodeGroovy(template: String, map: Map<String, Any>): String {
+fun decodeGroovy(template: String, map: LinkedHashMap<String, Any>): String {
     try {
         val writer = StringWriter()
         groovyTemplateEngine.createTemplate(template).make(map).writeTo(writer)

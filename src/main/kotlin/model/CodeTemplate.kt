@@ -35,4 +35,4 @@ data class GeneratedSourceCode(var className: String, var sourceCode: String)
  * */
 data class BindingSource (
     var className: String,
-    var bindParams: Map<String, Any>)
+    var bindParams: LinkedHashMap<String, Any>)
