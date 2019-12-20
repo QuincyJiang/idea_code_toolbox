@@ -1,4 +1,4 @@
-# Code Generator Plugin for IDEA
+#Code Generator Plugin for IDEA
 ## 一、概述
 这是一个基于`Velocity（VM 模板）`语法 和 `Groovy` 脚本语法，通过自定义脚本文件 和一个抽象的 `contextClass`概念 来完成模板代码自动生成的 `IDEA/AndroidStudio` 插件。
 
@@ -39,10 +39,43 @@
 这个当做一个feature去做，通过动态加载jar包应该是可以做到的，目前的设计还未支持。如果可以自定义转换器，插件的灵活性可以大大提升。
 
 
-## 三、模板通配符
+## 三、usage
 
-### contextClass
+### 1.模板配置
+1.配置目标代码语言 Kotlin / Java
 
+```java
+enum class CodeLanguage{
+    Java, Kotlin
+}
+```
+
+2.模板作用类型
+
+```java
+/**
+ * 模板生成类型 新建文件 还是 生成一个代码块
+ * File：根据className 生成一个新的.java文件
+ * CodeBlock: 代码块
+ * Clipboard： 将代码复制到剪切板
+ * */
+enum class TemplateType {
+    File, CodeBlock, Clipboard
+}
+```
+3.配置模板文件类型
+
+```java
+/**
+ * 模板文件语法 vm 或 groovy
+ * */
+enum class TemplateLanguage {
+    Vm, Groovy
+}
+```
+
+### 2. 模板书写规则
+#### contextClass通配符
 用来生成模板类的父类，是一个`ClassStruct`实体
 
 此处的父类不是`java`意义上的父类，可以把它理解为一个上下文对象，
@@ -75,6 +108,11 @@
                     |_ $methods.params: 方法入参
                                     |_ $param.name: 方法参数名
                                     |_ $param.type: 方法参数类型
+                                    |_ $param.comment: 方法参数注释
+                    |_ $methods.paramsStr: 入参列表toString
+                    |_ $methods.body: 方法体
+                    |_ $methods.comments: 方法注释 List<String> 可以迭代
+
 ```
 
 ### 其他通用通配符
@@ -87,29 +125,29 @@
 
 ### Demo Template File
 
-```groovy
+```Velocity
+package $contextClass.packageName ;
 
-package $contextClass.packageName;
-
-#foreach($import in $contextClass.importList)
-import $import;
+import com.yymobile.common.core.AbstractBaseCore;
+import com.yymobile.common.core.$contextClass.name;
 
 /**
  * @Date Created: $TIME
  * @Author $USER
- * @Description: $contextClass.comments
+ * @Description: $contextClass.comment
  */
-public ${ClassName} extends AbstractBaseCore implements ${contextClass.name} {
+public interface ${ClassName} extends AbstractBaseCore implements ${contextClass.name} {
+#foreach($method in $contextClass.methods)
+#if(!$null.isNull($method.comments) && $method.comments.size()>0)
+/**
+#foreach($comment in $method.comments)
+* $comment
+#end
+*/
+#end
+public ${method.returnType} ${method.name}($method.paramsStr) {
 
-#foreach($method in contextClass.methods)
-    /**
-    * $method.comments
-    **/
-    public $method.modifier $method.returnType $method.name (#foreach($param in method.params)
-    $param.type $param.name,
-    #end) {
-
-        }
 }
 #end
+}
 ```
