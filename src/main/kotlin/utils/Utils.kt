@@ -135,6 +135,7 @@ fun getMethods(psiClass: PsiClass): List<Method> {
             returnType, parameters,
             parameters.toParmsStr(),
             psiMethod.body?.text?: "",
+            // fixme 如果为空不加入list中
             ArrayList(psiMethod.docComment?.descriptionElements?.map {it.text?:""}?: ArrayList())
         )
     }

@@ -109,7 +109,7 @@ class Java2ClassConvert: IConvert {
             val packageName = ((psiFile as PsiClassOwner).packageName)
             val fields = getFields(input)
             val importList = getImportList(psiFile)
-            val methods = (getMethods(input))
+            val methods = getMethods(input)
             return ClassStruct(className?: "", classType, comment, extendsStr, implements, packageName,
              importList, fields, methods)
         } else throw IllegalArgumentException("Use Java2ClassCovert need an PsiJavaFile type input")

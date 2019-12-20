@@ -9,10 +9,10 @@ import com.yymobile.common.core.$contextClass.name;
 /**
  * @Date Created: $TIME
  * @Author $USER
- * @Description: $contextClass.comments
+ * @Description: $contextClass.comment
  */
-public interface ${ClassName} extends AbstractBaseCore implements ${contextClass}.name {
-#foreach($method in $context.methods)
+public interface ${ClassName} extends AbstractBaseCore implements ${contextClass.name} {
+#foreach($method in $contextClass.methods)
 #if(!$null.isNull($method.comments) && $method.comments.size()>0)
 /**
 #foreach($comment in $method.comments)
@@ -23,4 +23,5 @@ public interface ${ClassName} extends AbstractBaseCore implements ${contextClass
 public ${method.returnType} ${method.name}($method.paramsStr) {
 
 }
+#end
 }
