@@ -1,6 +1,7 @@
 package ui
 
 import model.HiidoStaticSheet
+import utils.centerDialog
 import java.awt.Dimension
 import java.awt.Insets
 import java.awt.event.KeyEvent
@@ -21,7 +22,7 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, v
 
 
     init {
-        setSize(400, 300)
+        centerDialog(400, 300)
         setContentPane(contentPane)
         buttonGroup = ButtonGroup()
         isModal = true

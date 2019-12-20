@@ -3,6 +3,7 @@ package actions
 import ToolboxSettings
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.ServiceManager
@@ -10,6 +11,7 @@ import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbService
+import com.intellij.psi.PsiDocumentManager
 import generator.Excel2ClassInterfaceConvert
 import model.GeneratedSourceCode
 import model.HiidoStaticExcel
@@ -19,7 +21,9 @@ import ui.ConfirmCodeDialog
 import ui.onConfirmListener
 import ui.onSelectListener
 import utils.readExcel
+import utils.reformatJavaFile
 import java.io.File
+
 
 /**
  * 动态注册的模板代码解析action
@@ -102,8 +106,15 @@ class HiidoCodeGeneratorAction internal constructor(private val templateKey: Str
         val runnable = Runnable {
             // post 一个runnable 去执行插入代码操作
             document.insertString(insertOffset, code.sourceCode)
+            // document操作之后必须commit 再执行代码format 不然会报错
+            PsiDocumentManager.getInstance(project).commitDocument(document)
+            val psiFile = e.getData(CommonDataKeys.PSI_FILE)
+            psiFile?.let {
+                reformatJavaFile(it)
+            }
         }
         //加入任务，由IDEA调度执行这个任务
         WriteCommandAction.runWriteCommandAction(project, runnable)
+
     }
 }

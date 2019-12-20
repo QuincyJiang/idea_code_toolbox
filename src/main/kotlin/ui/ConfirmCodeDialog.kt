@@ -1,6 +1,7 @@
 package ui
 
 import model.GeneratedSourceCode
+import utils.centerDialog
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -13,6 +14,7 @@ class ConfirmCodeDialog(var code: GeneratedSourceCode?, var listener: onConfirmL
     private var codeContent: JTextArea? = null
 
     init {
+        centerDialog( 700, 600)
         setSize(700, 600)
         setContentPane(contentPane)
         isModal = true
