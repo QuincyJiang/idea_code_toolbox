@@ -95,22 +95,22 @@ class Pb2ClassConvert: IConvert {
 class Java2ClassConvert: IConvert {
     override fun convert2Class(input: Any): ClassStruct? {
         if (input is PsiClass) {
-            val psiFile = input.containingFile
+            val psiFile = input.containingFile as? PsiJavaFile ?: throw Exception("Not a java file!")
             val classType = input.classKind.name
             val className = input.name
             val comment = getDocCommentText(input)
-            val extends = input.extendsList?.referenceElements?.map {
-                it.qualifiedName
+            var extendsStr = ""
+            getExtendList(input)?.let {
+                if (it.isNotEmpty()) {
+                    extendsStr = it[0]
+                }
             }
-            val implements = input.implementsList?.referenceElements?.map {
-                it.qualifiedName
-            }
+            val implements = getImplementsList(input)
             val packageName = ((psiFile as PsiClassOwner).packageName)
-            val fields = (getFields(input))
-            if (psiFile !is PsiJavaFile) throw Exception("Not a java file!")
+            val fields = getFields(input)
             val importList = getImportList(psiFile)
             val methods = (getMethods(input))
-            return ClassStruct(className?: "", classType, comment,extends?.get(0)?: "", implements, packageName,
+            return ClassStruct(className?: "", classType, comment, extendsStr, implements, packageName,
              importList, fields, methods)
         } else throw IllegalArgumentException("Use Java2ClassCovert need an PsiJavaFile type input")
     }

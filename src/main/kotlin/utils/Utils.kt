@@ -2,7 +2,12 @@ package utils
 
 import com.google.common.collect.Lists
 import com.intellij.ide.util.TreeClassChooserFactory
+import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
@@ -12,10 +17,15 @@ import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtilBase
 import model.Field
+import model.GeneratedSourceCode
 import model.Method
 import model.Param
 import java.awt.Toolkit
 import javax.swing.JDialog
+
+
+
+
 
 val TAG = "Utils"
 
@@ -71,9 +81,20 @@ fun generateClassPath(sourcePath: String, className: String, extension: String =
 /**
  * 获取目标类的importList
  * */
-fun getImportList(javaFile: PsiJavaFile): List<String> {
-    val importList = javaFile.importList ?: return ArrayList()
-    return importList.importStatements.map { it.qualifiedName?: "" }
+fun getImportList(javaFile: PsiJavaFile): List<String>? {
+    return javaFile.importList?.importStatements?.map { it.qualifiedName?:""}
+}
+
+fun getExtendList(javaFile: PsiClass): List<String>? {
+    return javaFile.extendsList?.referenceElements?.map {
+        it.qualifiedName
+    }
+}
+
+fun getImplementsList(javaFile: PsiClass): List<String>? {
+    return javaFile.implementsList?.referenceElements?.map {
+        it.qualifiedName
+    }
 }
 
 /**
@@ -100,7 +121,8 @@ fun getMethods(psiClass: PsiClass): List<Method> {
         val parameters :List<Param> = if (psiMethod.parameterList.isEmpty) ArrayList()
         else psiMethod.parameterList.parameters.map {
             psiParameter ->
-            Param(psiParameter.name?: "", psiParameter.modifierList?.text ?: "", null)
+            //fixme params type获取 comment获取
+            Param(psiParameter.name?: "", psiParameter.type.presentableText, null)
         }
         // 获取PSI 方法返回值类型
         val returnType = if (psiMethod.returnType == null)
@@ -113,10 +135,11 @@ fun getMethods(psiClass: PsiClass): List<Method> {
             returnType, parameters,
             parameters.toParmsStr(),
             psiMethod.body?.text?: "",
-            null
+            ArrayList(psiMethod.docComment?.descriptionElements?.map {it.text?:""}?: ArrayList())
         )
     }
 }
+
 
 /**
  * 根据PSI METHOD 查找父类
@@ -263,4 +286,55 @@ fun JDialog.centerDialog(width: Int, height: Int) {
     val screenWidth = screenSize.width //获取屏幕的宽
     val screenHeight = screenSize.height //获取屏幕的高
     this.setLocation(screenWidth / 2 - width / 2, screenHeight / 2 - height / 2)//设置窗口居中显示
+}
+
+/**
+ * 返回光标所在的最内层psiElement
+ * */
+fun getElement(editor: Editor, psiFile: PsiFile): PsiElement? {
+    return psiFile.findElementAt(editor.caretModel.offset)
+}
+
+/**
+ * 根据光标位置查找符合要求的psiElement
+ * 比如 当前光标在一个PsiMethod
+ * 但是要拿到它实际所在的class对象 就要用该方法往上递归查找
+ * */
+
+fun <T : PsiElement> getElement(editor: Editor, target: Class<T>): T? {
+    val element = PsiUtilBase.getElementAtCaret(editor) ?: return null
+    return PsiTreeUtil.getParentOfType(element, target)
+}
+
+fun insertCode(code: GeneratedSourceCode, e: AnActionEvent) {
+    val editor = e.getData(PlatformDataKeys.EDITOR)
+    val project = e.getData(PlatformDataKeys.PROJECT)
+    if (editor == null || project == null) {
+        return
+    }
+    //获取SelectionModel和Document对象
+    val selectionModel = editor.selectionModel
+    val document = editor.document
+    //得到选中字符串的结束位置
+    val endOffset = selectionModel.selectionEnd
+    // 插入截止index为document -1
+    val maxOffset = document.textLength - 1
+    // 获取光标选中行
+    val curLineNumber = document.getLineNumber(endOffset)
+    // 插入到选中行的下一行
+    val nextLineStartOffset = document.getLineStartOffset(curLineNumber + 1)
+    //计算字符串的插入位置
+    val insertOffset = if (maxOffset > nextLineStartOffset) nextLineStartOffset else maxOffset
+    val runnable = Runnable {
+        // post 一个runnable 去执行插入代码操作
+        document.insertString(insertOffset, code.sourceCode)
+        // document操作之后必须commit 再执行代码format 不然会报错
+        PsiDocumentManager.getInstance(project).commitDocument(document)
+        val psiFile = e.getData(CommonDataKeys.PSI_FILE)
+        psiFile?.let {
+            reformatJavaFile(it)
+        }
+    }
+    //加入任务，由IDEA调度执行这个任务
+    WriteCommandAction.runWriteCommandAction(project, runnable)
 }

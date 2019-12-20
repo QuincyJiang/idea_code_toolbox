@@ -23,12 +23,12 @@ const val CLASS_NAME_KEY = "ClassName"
  * 输入一个模板实体类CodeTemplate，输入一个抽象Class实体类，输出一个生成的GeneratedSourceCode文件
  * */
 interface ISourceGenerator {
-    fun combine(template: CodeTemplate, selectedClass: ClassStruct, currentClass: ClassStruct?): GeneratedSourceCode
+    fun combine(template: CodeTemplate, selectedClass: ClassStruct): GeneratedSourceCode
 }
 
 abstract class AbsSourceGenerator: ISourceGenerator {
-    override fun combine(template: CodeTemplate, selectedClass: ClassStruct, currentClass: ClassStruct?): GeneratedSourceCode {
-        val bindingSource = createBindingSource(template,selectedClass, currentClass)
+    override fun combine(template: CodeTemplate, selectedClass: ClassStruct): GeneratedSourceCode {
+        val bindingSource = createBindingSource(template,selectedClass)
         val source = doCombine(template, bindingSource)
         return GeneratedSourceCode(bindingSource.className, source)
     }
@@ -49,12 +49,10 @@ abstract class AbsSourceGenerator: ISourceGenerator {
      * */
     private fun createBindingSource(
         template: CodeTemplate,
-        selectedClass: ClassStruct,
-        targetClass: ClassStruct?
+        selectedClass: ClassStruct
     ): BindingSource {
         val map = LinkedHashMap<String, Any>()
         map["contextClass"] = selectedClass
-        map["class"] = targetClass ?: ""
         map["TIME"] = DateFormatUtils.format(Date(), "yyyy-MM-dd HH:mm:ss")
         map["USER"] = System.getProperty("user.name")
         map["BR"] = "\n"

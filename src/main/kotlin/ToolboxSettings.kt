@@ -8,6 +8,8 @@ import generator.GroovySourceGenerator
 import generator.VelocityTemplateGenerator
 import model.CodeLanguage
 import model.CodeTemplate
+import model.TemplateLanguage
+import model.TemplateType
 
 /**
  * 插件配置中心
@@ -22,13 +24,13 @@ class ToolboxSettings: PersistentStateComponent<ToolboxSettings> {
     // 初始化预置的默认模板
     init {
         // 根据选中IXXCore.java 生成XXCoreImp.java
-        mCodeTemplates["CoreImp"] = getDefaultTemplates("CoreImp",
+        mCodeTemplates["CoreImp"] = getDefaultTemplates(TemplateType.Clipboard, "CoreImp",
             CodeLanguage.Java, "#set(\$end = \${contextClass.name.length()} - 1)\${contextClass.name.substring(1,\${end})}Imp" ,"CoreImpTemp.vm")
         //快速生成模板接口代码
-        mCodeTemplates["IHiidoStatic"] = getDefaultTemplates("IHiidoStatic",
+        mCodeTemplates["IHiidoStatic"] = getDefaultTemplates(TemplateType.CodeBlock, "埋点接口代码",
             CodeLanguage.Java, "Default", "IHiidoStatic.vm" )
         //快速生成模板实现代码
-        mCodeTemplates["HiidoStaticImp"] = getDefaultTemplates("HiidoStaticImp",
+        mCodeTemplates["HiidoStaticImp"] = getDefaultTemplates(TemplateType.CodeBlock, "埋点实现代码",
             CodeLanguage.Java, "Default", "HiidoStaticImp.vm" )
     }
     override fun getState(): ToolboxSettings? {
@@ -40,16 +42,19 @@ class ToolboxSettings: PersistentStateComponent<ToolboxSettings> {
     }
 }
 
-fun getDefaultTemplates(templateName: String,
+fun getDefaultTemplates( templateType: TemplateType,
+                        templateName: String,
                         codeLanguage: CodeLanguage,
                         targetClassName: String,
                         templateFileName: String): CodeTemplate {
     val velocityTemplate =
         FileUtil.loadTextAndClose(ToolboxSettings::class.java.getResourceAsStream("/temp/$templateFileName"))
     return CodeTemplate(
+        templateType,
         templateName,
         targetClassName,
         codeLanguage,
-        velocityTemplate
+        velocityTemplate,
+        TemplateLanguage.Vm
     )
 }

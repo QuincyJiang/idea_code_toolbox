@@ -12,7 +12,15 @@ import com.yymobile.common.core.$contextClass.name;
  * @Description: $contextClass.comments
  */
 public interface ${ClassName} extends AbstractBaseCore implements ${contextClass}.name {
+#foreach($method in $context.methods)
+#if(!$null.isNull($method.comments) && $method.comments.size()>0)
+/**
+#foreach($comment in $method.comments)
+* $comment
+#end
+*/
+#end
+public ${method.returnType} ${method.name}($method.paramsStr) {
 
-
-
+}
 }
