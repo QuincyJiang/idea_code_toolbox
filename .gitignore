@@ -3,3 +3,4 @@ build/
 build/
 .gradle/
 src/main/resources/temp/*.xlsx
+out/
