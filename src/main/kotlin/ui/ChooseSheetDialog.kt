@@ -1,7 +1,6 @@
 package ui
 
 import model.HiidoStaticSheet
-import utils.centerDialog
 import java.awt.Dimension
 import java.awt.Insets
 import java.awt.event.KeyEvent
@@ -22,7 +21,7 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, v
 
 
     init {
-        centerDialog(this, 600, 400)
+        setSize(400, 300)
         setContentPane(contentPane)
         buttonGroup = ButtonGroup()
         isModal = true
@@ -36,7 +35,6 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, v
                 onCancel()
             }
         })
-        // call onCancel() on ESCAPE
         contentPane!!.registerKeyboardAction(
             { onCancel() },
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -65,6 +63,7 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, v
     }
 
     private fun onOK() {
+        dispose()
         mData?.let { map ->
             val sheetName = buttonGroup?.elements?.toList()?.filter {
                 it.isSelected
@@ -73,15 +72,12 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, v
                 listener?.onSelected(map[it])
             }
         }
-        dispose()
     }
 
     private fun onCancel() {
-        listener?.onCanceled()
         dispose()
     }
 }
 interface onSelectListener{
     fun onSelected(sheet: HiidoStaticSheet?)
-    fun onCanceled()
 }

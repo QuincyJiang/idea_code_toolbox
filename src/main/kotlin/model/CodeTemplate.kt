@@ -26,13 +26,13 @@ enum class TemplateType {
 /**
  * 解析模板和选中PSI Class File 生成对应的目标代码实体
  * */
-data class GeneratedSourceCode(var className: String, var sourceCode: String)
+@NoArg data class GeneratedSourceCode(var className: String, var sourceCode: String)
 
 /**
  * 模板解析占位符的源参数
  * @param className 生成类名
  * @param bindParams 源参数map 模板中需要用到的所有占位符的真实数据资源均放在该map中 由具体的模板解析器去映射
  * */
-data class BindingSource (
+@NoArg data class BindingSource (
     var className: String,
     var bindParams: LinkedHashMap<String, Any>)

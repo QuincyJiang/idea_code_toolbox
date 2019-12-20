@@ -1,10 +1,8 @@
-
-#快速生成埋点接口实现类代码
-
 #foreach($method in $contextClass.methods)
 @Override
-public void $method.name($method.paramsStr) {
+public void ${method.name}(${method.paramsStr}) {
 $method.body
 }
+
 #end
 

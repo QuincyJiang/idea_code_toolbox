@@ -36,7 +36,9 @@ class Excel2ClassInterfaceConvert: IConvert {
             method.modifier = "public"
             method.returnType = "void"
             val methodComments = ArrayList<String>()
-            methodComments.add(hiidoModel.remark)
+            if (!hiidoModel.remark.isEmpty()) {
+                methodComments.add(hiidoModel.remark)
+            }
             val params = ArrayList<Param>()
             val methodContent = StringBuilder().append("    MLog.info(TAG, \"${method.name} ")
             hiidoModel.keyList.forEachIndexed { index, hiidoStaticKey ->
