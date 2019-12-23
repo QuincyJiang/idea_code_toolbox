@@ -14,8 +14,7 @@ import model.HiidoStaticExcel
 import model.HiidoStaticSheet
 import ui.ChooseSheetDialog
 import ui.ConfirmCodeDialog
-import ui.onConfirmListener
-import ui.onSelectListener
+import utils.OnConfirmListener
 import utils.insertCode
 import utils.readExcel
 import java.io.File
@@ -57,16 +56,16 @@ class HiidoCodeGeneratorAction internal constructor(private val templateKey: Str
             val excel: HiidoStaticExcel? = readExcel(excelFile)
             val converter = Excel2ClassInterfaceConvert()
             excel?.let { staticExcel ->
-                val chooseSheetDialog = ChooseSheetDialog(staticExcel.sheets, object : onSelectListener {
-                    override fun onSelected(sheet: HiidoStaticSheet?) {
-                        sheet?.let { selectedSheet ->
+                val chooseSheetDialog = ChooseSheetDialog(staticExcel.sheets, object : OnConfirmListener<HiidoStaticSheet?> {
+                    override fun onConfirm(result: HiidoStaticSheet?) {
+                        result?.let { selectedSheet ->
                             val classStruct = converter.convert2Class(selectedSheet)
                             val template = settings.mCodeTemplates[templateKey]
                             val generator = settings.mVmSourceGenerator
-                            val result = generator.combine(template!!, classStruct!!)
-                            val codeConfirmDialog = ConfirmCodeDialog(result, object : onConfirmListener {
-                                override fun onSelected(code: GeneratedSourceCode?) {
-                                    code?.let { generatedSourceCode ->
+                            val sourceCode = generator.combine(template!!, classStruct!!)
+                            val codeConfirmDialog = ConfirmCodeDialog(sourceCode, object : OnConfirmListener<GeneratedSourceCode?> {
+                                override fun onConfirm(result: GeneratedSourceCode?) {
+                                    result?.let { generatedSourceCode ->
                                         insertCode(generatedSourceCode, e)
                                     }
                                 }

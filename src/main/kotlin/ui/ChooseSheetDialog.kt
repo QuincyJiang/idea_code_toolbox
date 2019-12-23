@@ -1,6 +1,7 @@
 package ui
 
 import model.HiidoStaticSheet
+import utils.OnConfirmListener
 import utils.centerDialog
 import java.awt.Dimension
 import java.awt.Insets
@@ -12,7 +13,7 @@ import javax.swing.*
 /**
  * 读取Excel files 后选择目标sheets
  * */
-class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, var listener: onSelectListener?) : JDialog() {
+class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, var listener: OnConfirmListener<HiidoStaticSheet?>?) : JDialog() {
     private var contentPane: JPanel? = null
     private var buttonOK: JButton? = null
     private var buttonCancel: JButton? = null
@@ -70,7 +71,7 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, v
                 it.isSelected
             }?.get(0)?.text
             sheetName?.let {
-                listener?.onSelected(map[it])
+                listener?.onConfirm(map[it])
             }
         }
     }
@@ -78,7 +79,4 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, v
     private fun onCancel() {
         dispose()
     }
-}
-interface onSelectListener{
-    fun onSelected(sheet: HiidoStaticSheet?)
 }

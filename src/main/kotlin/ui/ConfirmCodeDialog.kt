@@ -1,13 +1,14 @@
 package ui
 
 import model.GeneratedSourceCode
+import utils.OnConfirmListener
 import utils.centerDialog
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
 
-class ConfirmCodeDialog(var code: GeneratedSourceCode?, var listener: onConfirmListener?) : JDialog() {
+class ConfirmCodeDialog(var code: GeneratedSourceCode?, var listener: OnConfirmListener<GeneratedSourceCode?>?) : JDialog() {
     private var contentPane: JPanel? = null
     private var buttonOK: JButton? = null
     private var buttonCancel: JButton? = null
@@ -51,7 +52,7 @@ class ConfirmCodeDialog(var code: GeneratedSourceCode?, var listener: onConfirmL
                val result = GeneratedSourceCode::class.java.newInstance()
                 result.className = it.className
                 result.sourceCode = contentPaneEditedText
-                listener?.onSelected(result)
+                listener?.onConfirm(result)
             }
         }
     }
@@ -59,8 +60,5 @@ class ConfirmCodeDialog(var code: GeneratedSourceCode?, var listener: onConfirmL
     private fun onCancel() {
         dispose()
     }
-}
-interface onConfirmListener {
-    fun onSelected(code: GeneratedSourceCode?)
 }
 

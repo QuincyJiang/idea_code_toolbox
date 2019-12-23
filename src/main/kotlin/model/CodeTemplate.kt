@@ -41,6 +41,8 @@ enum class TemplateType {
  * */
 @NoArg data class GeneratedSourceCode(var className: String, var sourceCode: String)
 
+@NoArg data class SourceCodeBundle(var classStruct: ClassStruct, var codeTemplate: CodeTemplate, var generatedSourceCode: GeneratedSourceCode)
+
 /**
  * 模板解析占位符的源参数
  * @param className 生成类名

@@ -10,19 +10,20 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.DumbService
+import com.intellij.openapi.roots.JavaProjectRootsUtil
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.PsiClass
+import com.intellij.psi.PsiDirectory
+import com.intellij.psi.PsiManager
+import com.intellij.refactoring.PackageWrapper
+import com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesUtil
 import generator.Java2ClassConvert
-import model.CodeTemplate
-import model.GeneratedSourceCode
-import model.TemplateLanguage
-import model.TemplateType
+import model.*
 import ui.ConfirmCodeDialog
-import ui.onConfirmListener
-import utils.getElement
-import utils.insertCode
+import utils.*
 import java.awt.datatransfer.DataFlavor
-
+import java.util.*
 
 
 /**
@@ -52,9 +53,9 @@ class TempCodeGeneratorAction internal constructor(private val templateKey: Stri
                 TemplateType.CodeBlock -> {
                     generateCodeBlock(e, it)
                 }
-                // 生成新的文件 默认文件路径与当前光标所选文件在同一包下
+                // 生成新的文件 弹路径选择对话框 默认文件路径与当前光标所选文件在同一包下
                 TemplateType.File -> {
-                    generateNewFile()
+                    generateNewFile(e, it)
                 }
                 // 生成的代码拷贝在clipboard中
                 TemplateType.Clipboard -> {
@@ -66,31 +67,68 @@ class TempCodeGeneratorAction internal constructor(private val templateKey: Stri
 
     private fun generateCodeBlock(e: AnActionEvent, codeTemplate:CodeTemplate) {
         val generatedSourceCode = generateSourceCodeFromEditor(e, codeTemplate)
-        generatedSourceCode?.let {
+        generatedSourceCode?.generatedSourceCode?.let {
             insertCode(it, e)
         }
     }
 
-    private fun generateNewFile() {
-
+    private fun generateNewFile(e: AnActionEvent, codeTemplate:CodeTemplate) {
+        val sourceCodeBundle = generateSourceCodeFromEditor(e, codeTemplate)
+        sourceCodeBundle?.generatedSourceCode?.let {
+            val codeConfirmDialog = ConfirmCodeDialog(it, object : OnConfirmListener<GeneratedSourceCode?> {
+                override fun onConfirm(result: GeneratedSourceCode?) {
+                    result?.let { generatedSourceCode ->
+                        generatedSourceCode.className.let { className ->
+                            val project = e.project
+                            val psiFile = e.getData(CommonDataKeys.PSI_FILE)?.containingDirectory // origin file directory
+                            project?.let { javaProject ->
+                                val targetDirectories = LinkedHashSet<PsiDirectory>()
+                                val relativePathsToCreate = HashMap<PsiDirectory, String>()
+                                MoveClassesOrPackagesUtil.buildDirectoryList(
+                                    PackageWrapper(PsiManager.getInstance(javaProject), className),
+                                    JavaProjectRootsUtil.getSuitableDestinationSourceRoots(javaProject),
+                                    targetDirectories,
+                                    relativePathsToCreate
+                                )
+                                chooseDirectory(targetDirectories.toArray(PsiDirectory.EMPTY_ARRAY), psiFile, project, relativePathsToCreate, object : OnConfirmListener<VirtualFile?> {
+                                    override fun onConfirm(result: VirtualFile?) {
+                                        saveToFile(
+                                            e,
+                                            codeTemplate.codeLanguage,
+                                            sourceCodeBundle.generatedSourceCode.className,
+                                            sourceCodeBundle.generatedSourceCode.sourceCode,
+                                            sourceCodeBundle.classStruct,
+                                            result
+                                        )
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+            })
+            codeConfirmDialog.isVisible = true
+        }
     }
 
     private fun copyToClipboard(e: AnActionEvent, codeTemplate:CodeTemplate) {
-        val generatedSourceCode = generateSourceCodeFromEditor(e, codeTemplate)
-        val codeConfirmDialog = ConfirmCodeDialog(generatedSourceCode, object : onConfirmListener {
-            override fun onSelected(code: GeneratedSourceCode?) {
-                code?.let { generatedSourceCode ->
+        val codeBundle = generateSourceCodeFromEditor(e, codeTemplate)
+        codeBundle?.generatedSourceCode?.let {
+            val codeConfirmDialog = ConfirmCodeDialog(it, object : OnConfirmListener<GeneratedSourceCode?> {
+                override fun onConfirm(result: GeneratedSourceCode?) {
+                    result?.let { generatedSourceCode ->
                         CopyPasteManager.getInstance()
                             .setContents(SimpleTransferable(generatedSourceCode.sourceCode, DataFlavor.stringFlavor))
-                        Messages.showMessageDialog(e.project,"提示","代码已成功拷贝到剪贴板",Messages.getInformationIcon())
+                        Messages.showMessageDialog(e.project,"","代码已成功拷贝到剪贴板",Messages.getInformationIcon())
+                    }
                 }
-            }
-        })
-        codeConfirmDialog.isVisible = true
-
+            })
+            codeConfirmDialog.isVisible = true
+        }
     }
 
-    private fun generateSourceCodeFromEditor(e: AnActionEvent, codeTemplate:CodeTemplate): GeneratedSourceCode? {
+    // 从光标选中文件获取classStruct并合并为目标代码
+    private fun generateSourceCodeFromEditor(e: AnActionEvent, codeTemplate:CodeTemplate): SourceCodeBundle? {
         e.getData(CommonDataKeys.PSI_FILE)?.let {
             e.getData(PlatformDataKeys.EDITOR)?.let { editor ->
                 // 拿到光标最外层的psiClass 目的是要用这个psiClass构造classStruct
@@ -106,7 +144,7 @@ class TempCodeGeneratorAction internal constructor(private val templateKey: Stri
                         }  else {
                             settings.mGroovySourceGenerator
                         }
-                        return generator.combine(codeTemplate, struct)
+                        return SourceCodeBundle(struct, codeTemplate, generator.combine(codeTemplate, struct))
                     }
                 }
             }

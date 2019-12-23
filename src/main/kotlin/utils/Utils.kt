@@ -1,31 +1,36 @@
 package utils
 
+import actions.CreateFileRunnable
 import com.google.common.collect.Lists
+import com.intellij.ide.util.DirectoryChooser
 import com.intellij.ide.util.TreeClassChooserFactory
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileChooser.FileChooser
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.VfsUtil
+import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.vfs.VirtualFileManager
 import com.intellij.psi.*
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.impl.source.javadoc.PsiDocTokenImpl
 import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtilBase
-import model.Field
-import model.GeneratedSourceCode
-import model.Method
-import model.Param
+import model.*
 import java.awt.Toolkit
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent
+import javax.swing.Action
 import javax.swing.JDialog
-
-
-
 
 
 val TAG = "Utils"
@@ -361,4 +366,74 @@ fun insertCode(code: GeneratedSourceCode, e: AnActionEvent) {
     }
     //加入任务，由IDEA调度执行这个任务
     WriteCommandAction.runWriteCommandAction(project, runnable)
+}
+
+fun chooseDirectory(
+    targetDirectories: Array<PsiDirectory>,
+    initialDirectory: PsiDirectory?,
+    project: Project,
+    relativePathsToCreate: Map<PsiDirectory, String>,
+    listener: OnConfirmListener<VirtualFile?>
+) {
+    val SHOW_SOURCE_CODE = 555
+    val chooser = object : DirectoryChooser(project) {
+        override fun createLeftSideActions(): Array<Action> {
+            val action = object : DialogWrapper.DialogWrapperAction("Show Source") {
+                override fun doAction(e: ActionEvent) {
+                    close(SHOW_SOURCE_CODE)
+                }
+            }
+            action.putValue(Action.MNEMONIC_KEY, KeyEvent.VK_S)
+            action.putValue(Action.DISPLAYED_MNEMONIC_INDEX_KEY, 0)
+            action.putValue(Action.LONG_DESCRIPTION, "Show Generate Source")
+            return arrayOf(action)
+        }
+    }
+    chooser.title = "选择目标代码生成路径"
+    chooser.fillList(
+        targetDirectories,
+        initialDirectory,
+        project,
+        relativePathsToCreate
+    )
+    chooser.show()
+    if (chooser.isOK && chooser.selectedDirectory != null)
+        chooser.selectedDirectory?.virtualFile?.let {
+            listener.onConfirm(it)
+        }
+}
+
+fun saveToFile(
+    anActionEvent: AnActionEvent,
+    language: CodeLanguage,
+    className: String,
+    content: String,
+    currentClass: ClassStruct,
+    destination: VirtualFile?
+) {
+    val sourcePath = destination?.path + "/" + currentClass.packageName.replace(".", "/")
+    val targetPath = generateClassPath(sourcePath, className, language(language) )
+    val manager = VirtualFileManager.getInstance()
+    val virtualFile = manager
+        .refreshAndFindFileByUrl(VfsUtil.pathToUrl(targetPath))
+    if (virtualFile == null || !virtualFile.exists() || userConfirmedOverride()) {
+        // runnable 去写file
+        ApplicationManager.getApplication().runWriteAction(
+            CreateFileRunnable(
+                targetPath, content, "UTF-8", anActionEvent
+                    .dataContext
+            )
+        )
+    }
+}
+
+private fun language(language: CodeLanguage): String {
+    return when(language) {
+        CodeLanguage.Java -> "java"
+        CodeLanguage.Kotlin -> "kt"
+    }
+}
+
+private fun userConfirmedOverride(): Boolean {
+    return Messages.showYesNoDialog("Overwrite?", "File Exists", null) == Messages.YES
 }
