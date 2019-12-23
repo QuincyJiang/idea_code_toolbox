@@ -1,27 +1,31 @@
 
 #根据接口快速生成IXXCoreImp.java实现类文件
 
-package $contextClass.packageName ;
+package $contextClass.packageName;
 
 import com.yymobile.common.core.AbstractBaseCore;
 import com.yymobile.common.core.$contextClass.name;
 
 /**
  * @Date Created: $TIME
- * @Author $USER
- * @Description: $contextClass.comment
+ * @Author: $USER
+ * @Description:
+ #foreach($comment in $contextClass.comments)
+ *$comment
+ #end
  */
 public interface ${ClassName} extends AbstractBaseCore implements ${contextClass.name} {
 #foreach($method in $contextClass.methods)
 #if(!$null.isNull($method.comments) && $method.comments.size()>0)
 /**
 #foreach($comment in $method.comments)
-* $comment
+ * $comment
 #end
-*/
+ */
 #end
 public ${method.returnType} ${method.name}($method.paramsStr) {
 
 }
+
 #end
 }

@@ -25,7 +25,7 @@ class ToolboxSettings: PersistentStateComponent<ToolboxSettings> {
     init {
         // 根据选中IXXCore.java 生成XXCoreImp.java
         mCodeTemplates["CoreImp"] = getDefaultTemplates(TemplateType.Clipboard, "CoreImp",
-            CodeLanguage.Java, "#set(\$end = \${contextClass.name.length()} - 1)\${contextClass.name.substring(1,\${end})}Imp" ,"CoreImpTemp.vm")
+            CodeLanguage.Java, "#set(\$end = \${contextClass.name.length()})\${contextClass.name.substring(1,\${end})}Imp" ,"CoreImpTemp.vm")
         //快速生成模板接口代码
         mCodeTemplates["IHiidoStatic"] = getDefaultTemplates(TemplateType.CodeBlock, "埋点接口代码",
             CodeLanguage.Java, "Default", "IHiidoStatic.vm" )

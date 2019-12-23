@@ -55,7 +55,7 @@ class ChooseSheetDialog(private var mData: HashMap<String, HiidoStaticSheet>?, v
 
     private fun addSheetsList() {
         sheetsList!!.layout = BoxLayout(sheetsList, BoxLayout.Y_AXIS)
-        mData?.forEach { sheetsName, sheetsData ->
+        mData?.forEach { sheetsName, _ ->
             val radioButton = JRadioButton(sheetsName)
             radioButton.margin = Insets(20, 20, 20, 20)
             sheetsList?.add(radioButton)

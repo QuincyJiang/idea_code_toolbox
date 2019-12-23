@@ -13,6 +13,7 @@ import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
 import com.intellij.psi.codeStyle.CodeStyleManager
+import com.intellij.psi.impl.source.javadoc.PsiDocTokenImpl
 import com.intellij.psi.javadoc.PsiDocComment
 import com.intellij.psi.util.PsiTreeUtil
 import com.intellij.psi.util.PsiUtilBase
@@ -119,10 +120,9 @@ fun getMethods(psiClass: PsiClass): List<Method> {
     return psiClass.methods.map { psiMethod ->
         // 获取PSI 方法参数列表
         val parameters :List<Param> = if (psiMethod.parameterList.isEmpty) ArrayList()
-        else psiMethod.parameterList.parameters.map {
+        else psiMethod.parameterList.parameters.filter { it.name != null && !it.name!!.isEmpty() }.map {
             psiParameter ->
-            //fixme params type获取 comment获取
-            Param(psiParameter.name?: "", psiParameter.type.presentableText, null)
+            Param(psiParameter.name!!, psiParameter.type.presentableText, getParamsComment(psiMethod, psiParameter))
         }
         // 获取PSI 方法返回值类型
         val returnType = if (psiMethod.returnType == null)
@@ -135,10 +135,33 @@ fun getMethods(psiClass: PsiClass): List<Method> {
             returnType, parameters,
             parameters.toParmsStr(),
             psiMethod.body?.text?: "",
-            // fixme 如果为空不加入list中
-            ArrayList(psiMethod.docComment?.descriptionElements?.map {it.text?:""}?: ArrayList())
+            getMethodComments(psiMethod)
         )
     }
+}
+
+private fun getMethodComments(method: PsiMethod?): ArrayList<String> {
+    val comments = ArrayList<String>()
+    method?.docComment?.descriptionElements?.forEach {
+        it.text?.let { text ->
+            if (!text.trim().isEmpty()) {
+                comments.add(text)
+            }
+        }
+    }
+    return comments
+}
+
+/**
+ * 查找param的注释内容
+ * */
+private fun getParamsComment(method: PsiMethod?, param: PsiParameter): String? {
+    return  method?.docComment?.findTagsByName("param")
+        ?.filter { it.valueElement != null && it.valueElement!!.text.contains(param.name?:"")  }
+        ?.flatMap { it.dataElements.asIterable() }
+        ?.filter { element -> element is PsiDocTokenImpl && !element.text.trim().isEmpty()}
+        ?.map { it.text.trim() }
+        ?.toString()?.replace("[", "")?.replace("]", "")
 }
 
 
@@ -204,20 +227,20 @@ private fun getDocCommentText(psiField: PsiField): ArrayList<String>? {
     }
     val content = ArrayList<String>()
     for (element in psiField.docComment!!.descriptionElements) {
-        content.add(element.text)
+        content.addAll(element.text.split("\n"))
     }
-    return content
+    return ArrayList(content.filter { !it.trim().isEmpty() })
 }
 
 fun getDocCommentText(psiClass: PsiClass): ArrayList<String>? {
     if (psiClass.docComment == null) {
         return null
     }
-    val content = ArrayList<String>()
-    for (element in psiClass.docComment!!.descriptionElements) {
-        content.add(element.text)
+    val comments = ArrayList<String>()
+    psiClass.docComment!!.descriptionElements.forEach {
+        comments.addAll(it.text.split("\n"))
     }
-    return content
+    return ArrayList(comments.filter { !it.trim().isEmpty() })
 }
 
 

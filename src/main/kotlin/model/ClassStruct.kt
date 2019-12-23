@@ -46,7 +46,7 @@ package model
  * 一个class文件的抽象实体
  * @param name 类名
  * @param type 类类型 接口 类 枚举
- * @param comment 类注释
+ * @param comments 类注释
  * @param extends 继承信息
  * @param implements 接口信息
  * @param packageName 包名
@@ -55,7 +55,7 @@ package model
  * @param methods 类函数
  * @param
  * */
-@NoArg data class ClassStruct(var name: String, var type: String, var comment: ArrayList<String>?, var extends: String?,
-                                 var implements: List<String>?, var packageName: String, var importList: List<String>?,
-                                 var fields: List<Field>?,
-                                 var methods : List<Method>?)
+@NoArg data class ClassStruct(var name: String, var type: String, var comments: ArrayList<String>?, var extends: String?,
+                              var implements: List<String>?, var packageName: String, var importList: List<String>?,
+                              var fields: List<Field>?,
+                              var methods : List<Method>?)

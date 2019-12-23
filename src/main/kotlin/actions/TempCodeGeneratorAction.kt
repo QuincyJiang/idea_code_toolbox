@@ -17,6 +17,8 @@ import model.CodeTemplate
 import model.GeneratedSourceCode
 import model.TemplateLanguage
 import model.TemplateType
+import ui.ConfirmCodeDialog
+import ui.onConfirmListener
 import utils.getElement
 import utils.insertCode
 import java.awt.datatransfer.DataFlavor
@@ -75,15 +77,21 @@ class TempCodeGeneratorAction internal constructor(private val templateKey: Stri
 
     private fun copyToClipboard(e: AnActionEvent, codeTemplate:CodeTemplate) {
         val generatedSourceCode = generateSourceCodeFromEditor(e, codeTemplate)
-        generatedSourceCode?.let {
-            CopyPasteManager.getInstance()
-                .setContents(SimpleTransferable(it.sourceCode, DataFlavor.stringFlavor))
-            Messages.showMessageDialog(e.project,"提示","代码已成功拷贝到剪贴板",Messages.getInformationIcon());
-        }
+        val codeConfirmDialog = ConfirmCodeDialog(generatedSourceCode, object : onConfirmListener {
+            override fun onSelected(code: GeneratedSourceCode?) {
+                code?.let { generatedSourceCode ->
+                        CopyPasteManager.getInstance()
+                            .setContents(SimpleTransferable(generatedSourceCode.sourceCode, DataFlavor.stringFlavor))
+                        Messages.showMessageDialog(e.project,"提示","代码已成功拷贝到剪贴板",Messages.getInformationIcon())
+                }
+            }
+        })
+        codeConfirmDialog.isVisible = true
+
     }
 
     private fun generateSourceCodeFromEditor(e: AnActionEvent, codeTemplate:CodeTemplate): GeneratedSourceCode? {
-        e.getData(CommonDataKeys.PSI_FILE)?.let { psiFile ->
+        e.getData(CommonDataKeys.PSI_FILE)?.let {
             e.getData(PlatformDataKeys.EDITOR)?.let { editor ->
                 // 拿到光标最外层的psiClass 目的是要用这个psiClass构造classStruct
                 val psiClass = getElement(editor, PsiClass::class.java)

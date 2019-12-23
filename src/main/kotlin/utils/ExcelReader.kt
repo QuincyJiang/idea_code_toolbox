@@ -99,6 +99,7 @@ fun Cell?.getCellContent(): String {
             CellType.ERROR -> return ""
             CellType.NUMERIC -> return this.numericCellValue.toString()
             CellType.FORMULA -> return ""
+            else -> return ""
         }
     }
     return ""

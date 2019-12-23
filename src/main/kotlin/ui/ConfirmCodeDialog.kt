@@ -14,7 +14,7 @@ class ConfirmCodeDialog(var code: GeneratedSourceCode?, var listener: onConfirmL
     private var codeContent: JTextArea? = null
 
     init {
-        centerDialog( 700, 600)
+        centerDialog(  700, 600)
         setSize(700, 600)
         setContentPane(contentPane)
         isModal = true
