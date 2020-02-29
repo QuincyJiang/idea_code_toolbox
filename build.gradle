@@ -25,8 +25,18 @@ dependencies {
     implementation group: 'org.apache.poi', name: 'poi', version: '4.1.1'
 }
 intellij {
-    version '2019.1'
+    version '192.7142.36'
+    type 'IC'
+    plugins 'android'
+    plugins 'java'
 }
+
+runIde {
+    // Absolute path to installed target v3.5 Android Studio to use as IDE Development Instance
+    // The "Contents" directory is macOS specific.
+    ideDirectory '/Applications/Android Studio.app/Contents'
+}
+
 patchPluginXml {
     changeNotes """
       Add change notes here.<br>
