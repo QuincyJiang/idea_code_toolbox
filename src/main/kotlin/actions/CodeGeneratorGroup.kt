@@ -28,10 +28,10 @@ class CodeGeneratorGroup: ActionGroup(), DumbAware {
         var action: AnAction? = ActionManager.getInstance().getAction(actionId)
         if (action == null) {
             // 对埋点这种业务特殊处理下 毕竟埋点的excel解析目前不太通用
-            if (key === "IHiidoStatic" || key === "HiidoStaticImp") {
-                action = HiidoCodeGeneratorAction(key)
+            action = if (key == "埋点接口代码" || key == "埋点实现类代码") {
+                HiidoCodeGeneratorAction(key)
             } else {
-                action = TempCodeGeneratorAction(key)
+                TempCodeGeneratorAction(key)
             }
             ActionManager.getInstance().registerAction(actionId, action)
         }

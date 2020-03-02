@@ -21,7 +21,7 @@ class ToolBoxConfiguration(settings: ToolboxSettings?) {
     var mainPanel: JPanel? = null
 
     init {
-        settings?.mCodeTemplates?.forEach { t, u ->
+        settings?.mCodeTemplates?.forEach { _, u ->
             addNewTab(u)
         }
         addPlusTab()
@@ -35,23 +35,23 @@ class ToolBoxConfiguration(settings: ToolboxSettings?) {
         val index = tabbedPanel!!.tabCount - indexFromEnd
         val editPannel = ToolBoxSettingPanel(codeTemplate)
         tabbedPanel!!.insertTab(codeTemplate.templateName, null, editPannel.mainPanel, null, index)
-        tabbedPanel!!.setTabComponentAt(index, tabTitleComponent(codeTemplate.templateName))
+        tabbedPanel!!.setTabComponentAt(index, tabTitleComponent(codeTemplate))
         return index
     }
 
-    private fun tabTitleComponent(title: String): Component {
+    private fun tabTitleComponent(codeTemplate: CodeTemplate): Component {
         return JPanel(
             FlowLayout(
                 FlowLayout.CENTER, 0, 0)
         ).apply {
-            add(JLabel(title).apply { isOpaque = false })
+            add(JLabel(codeTemplate.templateName).apply { isOpaque = false })
             isOpaque = false
             add(JLabel(AllIcons.Actions.Close).apply {
                 isOpaque = false
                 toolTipText = "删除模板"
                 addMouseListener(object : MouseListener {
                     override fun mouseClicked(e: MouseEvent?) {
-                        deleteTemplate(title)
+                        deleteTemplate(codeTemplate.templateName)
                     }
 
                     override fun mouseReleased(e: MouseEvent?) {
@@ -81,7 +81,7 @@ class ToolBoxConfiguration(settings: ToolboxSettings?) {
 
     private fun refresh() {
         tabbedPanel!!.removeAll()
-        ServiceManager.getService(ToolboxSettings::class.java).mCodeTemplates.forEach { t, u ->
+        ServiceManager.getService(ToolboxSettings::class.java).mCodeTemplates.forEach { _, u ->
             addNewTab(u)
         }
         addPlusTab()
@@ -130,7 +130,7 @@ class ToolBoxConfiguration(settings: ToolboxSettings?) {
         }
         tabbedPanel?.selectedIndex = _index
     }
-    public fun createUIComponents() {
+    fun createUIComponents() {
         tabbedPanel = JTabbedPane()
     }
 }

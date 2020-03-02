@@ -4,8 +4,9 @@
     <vendor email="jiangxiaqiu@yy.com" url="">YY INC</vendor>
 
     <description>
-        一个快速生成模板类代码的辅助插件
-        旨在减少样板类代码的编写时间，每次为你节省20s 一天可以多出一倍coffee time
+        一个快速生成模板类代码的辅助插件 ，旨在减少样板类代码的编写时间。
+        模板配置: Preference -> Other Settings -> GVCodeToolBox
+        用法: 在当前类中右键 Generate -> CodeGenerator -> 选中模板 一键生成。
     </description>
 
     <change-notes>
@@ -25,7 +26,7 @@
     </extensions>
     <actions>
 
-        <group id="com.jiangxq.toolbox.CodeGeneratorGroup" class="actions.CodeGeneratorGroup" text="CodeGeneratorGroup"
+        <group id="com.jiangxq.toolbox.CodeGeneratorGroup" class="actions.CodeGeneratorGroup" text="CodeGenerator"
                 description="模板代码生成组" popup="true">
             <add-to-group group-id="GenerateGroup" anchor="after" relative-to-action="JavaGenerateGroup1"/>
         </group>
