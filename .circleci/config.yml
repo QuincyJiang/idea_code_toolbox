@@ -2,7 +2,6 @@
 #
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
-version: 2
 jobs:
   build:
     docker:
@@ -38,14 +37,12 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      # run tests!
-      - run: gradle build
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
     steps:
       - attach_workspace:
-          at: ./artifacts
+          at: ./build/idea-sandbox/plugins/
       - run:
           name: "Publish Release on GitHub"
           command: |
