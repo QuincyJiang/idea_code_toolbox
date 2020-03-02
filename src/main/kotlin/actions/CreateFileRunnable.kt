@@ -10,7 +10,6 @@ import com.intellij.openapi.vfs.VirtualFileManager
 import org.apache.commons.io.FileUtils
 import utils.loge
 import java.io.File
-import java.nio.charset.UnsupportedCharsetException
 
 class CreateFileRunnable(
     private val outputFile: String,
@@ -46,7 +45,7 @@ class CreateFileRunnable(
                     )
                 }
 
-        } catch (ex: UnsupportedCharsetException) {
+        } catch (ex: Exception) {
             ApplicationManager.getApplication().invokeLater {
                 Messages.showMessageDialog(
                     "Unknown Charset: $fileEncoding, please use the correct charset",

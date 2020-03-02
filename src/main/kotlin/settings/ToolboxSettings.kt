@@ -1,4 +1,4 @@
-
+package settings
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
@@ -24,14 +24,23 @@ class ToolboxSettings: PersistentStateComponent<ToolboxSettings> {
     // 初始化预置的默认模板
     init {
         // 根据选中IXXCore.java 生成XXCoreImp.java
-        mCodeTemplates["CoreImp"] = getDefaultTemplates(TemplateType.File, "CoreImp",
-            CodeLanguage.Java, "#set(\$end = \${contextClass.name.length()})\${contextClass.name.substring(1,\${end})}Imp" ,"CoreImpTemp.vm")
+        mCodeTemplates["CoreImp"] = getDefaultTemplates(
+            TemplateType.File,
+            "CoreImp",
+            CodeLanguage.Java,
+            "#set(\$end = \${contextClass.name.length()})\${contextClass.name.substring(1,\${end})}Imp",
+            "CoreImpTemp.vm"
+        )
         //快速生成模板接口代码
-        mCodeTemplates["IHiidoStatic"] = getDefaultTemplates(TemplateType.CodeBlock, "埋点接口代码",
-            CodeLanguage.Java, "Default", "IHiidoStatic.vm" )
+        mCodeTemplates["IHiidoStatic"] = getDefaultTemplates(
+            TemplateType.CodeBlock, "埋点接口代码",
+            CodeLanguage.Java, "Default", "IHiidoStatic.vm"
+        )
         //快速生成模板实现代码
-        mCodeTemplates["HiidoStaticImp"] = getDefaultTemplates(TemplateType.CodeBlock, "埋点实现代码",
-            CodeLanguage.Java, "Default", "HiidoStaticImp.vm" )
+        mCodeTemplates["HiidoStaticImp"] = getDefaultTemplates(
+            TemplateType.CodeBlock, "埋点实现代码",
+            CodeLanguage.Java, "Default", "HiidoStaticImp.vm"
+        )
     }
     override fun getState(): ToolboxSettings? {
        return this

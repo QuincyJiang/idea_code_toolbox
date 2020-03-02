@@ -1,6 +1,5 @@
 package actions
 
-import ToolboxSettings
 import com.intellij.designer.clipboard.SimpleTransferable
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -20,6 +19,7 @@ import com.intellij.refactoring.PackageWrapper
 import com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesUtil
 import generator.Java2ClassConvert
 import model.*
+import settings.ToolboxSettings
 import ui.ConfirmCodeDialog
 import utils.*
 import java.awt.datatransfer.DataFlavor

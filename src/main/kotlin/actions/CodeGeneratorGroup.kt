@@ -1,9 +1,9 @@
 package actions
 
-import ToolboxSettings
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.DumbAware
+import settings.ToolboxSettings
 import java.util.*
 
 class CodeGeneratorGroup: ActionGroup(), DumbAware {

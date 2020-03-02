@@ -9,6 +9,7 @@ package model
  * @param tempStr 模板内容
  * @param templateLanguage 模板语言
  * */
+@NoArg
 data class CodeTemplate(var templateType: TemplateType, var templateName: String, var targetClassNameTemp: String,
                         var codeLanguage: CodeLanguage, var tempStr: String, var templateLanguage: TemplateLanguage)
 

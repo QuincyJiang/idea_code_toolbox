@@ -1,6 +1,5 @@
 package actions
 
-import ToolboxSettings
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.components.ServiceManager
@@ -12,6 +11,7 @@ import generator.Excel2ClassInterfaceConvert
 import model.GeneratedSourceCode
 import model.HiidoStaticExcel
 import model.HiidoStaticSheet
+import settings.ToolboxSettings
 import ui.ChooseSheetDialog
 import ui.ConfirmCodeDialog
 import utils.OnConfirmListener

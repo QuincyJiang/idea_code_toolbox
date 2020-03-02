@@ -17,8 +17,9 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <!--存储中心-->
-        <applicationService serviceInterface="ToolboxSettings"
-                            serviceImplementation="ToolboxSettings"/>
+       <applicationService
+               serviceImplementation = "settings.ToolboxSettings"
+       />
         <!-- 配置UI-->
         <applicationConfigurable instance="ui.ToolBoxConfigurable"/>
     </extensions>
