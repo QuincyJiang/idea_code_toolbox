@@ -57,7 +57,7 @@ workflows:
   main:
     jobs:
       - build
-      - publish-github-release
+      - publish-github-release:
         requires:
           - build
           filters:
