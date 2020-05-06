@@ -58,6 +58,10 @@ fun readExcel(file: File): HiidoStaticExcel?  {
             xssfSheet.forEachIndexed outerLoop@ {index, xssfSeetRow ->
                 // 出去表头行 解析其余行 生成HiidoSaticSheet
                 if (index > sheetIndex!!.titleRowIndex) {
+                    if (xssfSeetRow.getCell(sheetIndex.labelIndex).getCellContent().isEmpty()) {
+                        // 过滤Label为空的列
+                        return@outerLoop
+                    }
                     val hiidoStaticModel = HiidoStaticModel::class.java.newInstance()
                     hiidoStaticModel.lable = xssfSeetRow.getCell(sheetIndex.labelIndex).getCellContent()
                     hiidoStaticModel.property = xssfSeetRow.getCell(sheetIndex.propertyIndex).getCellContent()
